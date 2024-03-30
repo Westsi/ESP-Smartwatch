@@ -1,4 +1,4 @@
-21808875372963855
+21814010833112672
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -49467,6 +49467,27 @@ Wire Pad, Square, SMD Pad,  5mm x 10mm,
 MesurementPoint Square SMDPad 5mmx10mm 
 0
 1
+1
+Connector_Wire_SMD
+Wire_Pad_1x01
+
+
+0
+1
+1
+Connector_Wire_SMD
+Wire_Pad_1x02
+
+
+0
+2
+1
+Connector_Wire_SMD
+Wire_Pad_1x03
+
+
+0
+3
 1
 Connector_Wuerth
 Wuerth_WR-WTB_64800211622_1x02_P1.50mm_Vertical
