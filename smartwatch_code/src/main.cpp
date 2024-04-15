@@ -3,8 +3,8 @@
 #include "stepcounter.h"
 #include "sdc.h"
 #include "touchscreen.h"
-#include "phone_connection.h"
-#include "devicepins.h"
+#include "ble.h"
+#include "declarations.h"
 
 void setup() {
   Serial.begin(115200);

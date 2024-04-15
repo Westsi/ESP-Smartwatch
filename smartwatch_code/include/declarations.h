@@ -1,5 +1,5 @@
-#ifndef DEVICE_PINS_H_
-#define DEVICE_PINS_H_
+#ifndef DECLARATIONS_H_
+#define DECLARATIONS_H_
 
 #define MPU_SDA 32
 #define MPU_SCL 33
@@ -17,6 +17,13 @@
 
 #define TOUCH_SDA 21
 #define TOUCH_SCL 22
+
+#define MANU_NAME "XONIZE_IND"
+#define MODEL_NUM "XSW1"
+#define FIRMWARE_REV "0.1.0-alpha.1"
+#define SOFTWARE_REV "0.1.0-alpha.1"
+#define HARDWARE_REV "0.1.0-testing.1"
+#define SYSTEM_ID "XSW-DEADBEEF1"
 
 
 #endif

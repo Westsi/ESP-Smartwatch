@@ -1,5 +1,5 @@
 #include "stepcounter.h"
-#include "devicepins.h"
+#include "declarations.h"
 
 #include <Wire.h>
 #include "MPU6050_tockn.h"
@@ -9,6 +9,8 @@ MPU6050 mpu(Wire);
 int16_t aX, aY, aZ, gX, gY, gZ;
 
 long timer = 0;
+
+uint32_t steps = 0;
 
 void sc_setup() {
     Wire.begin(MPU_SDA, MPU_SCL);
@@ -21,6 +23,7 @@ void sc_loop() {
         sc_read();
         sc_write_serial();
         timer = millis();
+        steps = millis() / 1000;
     }
 }
 
@@ -46,4 +49,8 @@ void sc_write_serial() {
     Serial.print(gY);
     Serial.print(",");
     Serial.println(gZ);
+}
+
+uint32_t getSteps() {
+    return steps;
 }
