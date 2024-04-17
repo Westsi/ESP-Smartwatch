@@ -1,4 +1,4 @@
-package com.xonize.xswatchconnect.main;
+package com.xonize.xswatchconnect;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -17,14 +17,10 @@ import com.welie.blessed.ConnectionPriority;
 import com.welie.blessed.GattStatus;
 import com.welie.blessed.HciStatus;
 
-import com.welie.blessed.PhyOptions;
-import com.welie.blessed.PhyType;
 import com.welie.blessed.ScanFailure;
-import com.welie.blessed.WriteType;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -37,9 +33,11 @@ class BluetoothHandler {
 
     // Intent constants
     public static final String MEASUREMENT_STEPCOUNT = "xonize.measurement.stepcount";
+    public static final String MEASUREMENT_STEPCOUNT_EXTRA = "xonize.measurement.stepcount.extra";
+    public static final String MEASUREMENT_EXTRA_PERIPHERAL = "xonize.measurement.peripheral";
 
     // UUIDs for the Device Information service (DIS)
-    private static final UUID DEVICE_INFORMATION_SERVICE_UUID = UUID.fromString("00002A19-0000-1000-8000-00805F9B34FB");
+    private static final UUID DEVICE_INFORMATION_SERVICE_UUID = UUID.fromString("0000180A-0000-1000-8000-00805F9B34FB");
     private static final UUID MANUFACTURER_NAME_CHARACTERISTIC_UUID = UUID.fromString("00002A29-0000-1000-8000-00805F9B34FB");
     private static final UUID MODEL_NUMBER_CHARACTERISTIC_UUID = UUID.fromString("00002A24-0000-1000-8000-00805F9B34FB");
     private static final UUID FIRMWARE_REV_CHARACTERISTIC_UUID = UUID.fromString("00002A26-0000-1000-8000-00805F9B34FB");
@@ -50,6 +48,10 @@ class BluetoothHandler {
     // UUIDs for the Battery Service (BAS)
     private static final UUID BATTERY_LEVEL_SERVICE_UUID = UUID.fromString("0000180F-0000-1000-8000-00805F9B34FB");
     private static final UUID BATTERY_LEVEL_CHARACTERISTIC_UUID = UUID.fromString("00002A19-0000-1000-8000-00805F9B34FB");
+
+    // UUIDs for the Step Counter Service
+    private static final UUID STEPCOUNT_SERVICE_UUID = UUID.fromString("00001809-0000-1000-8000-00805F9B34FB");
+    private static final UUID STEPCOUNT_CHARACTERISTIC_UUID = UUID.fromString("00002B40-0000-1000-8000-00805F9B34FB");
 
     // Local variables
     public BluetoothCentralManager central;
@@ -77,7 +79,7 @@ class BluetoothHandler {
 
             // Try to turn on notifications for other characteristics
             peripheral.readCharacteristic(BATTERY_LEVEL_SERVICE_UUID, BATTERY_LEVEL_CHARACTERISTIC_UUID);
-//            peripheral.setNotify(BLOOD_PRESSURE_SERVICE_UUID, BLOOD_PRESSURE_MEASUREMENT_CHARACTERISTIC_UUID, true);
+            peripheral.setNotify(STEPCOUNT_SERVICE_UUID, STEPCOUNT_CHARACTERISTIC_UUID, true);
         }
 
         @Override
@@ -117,12 +119,35 @@ class BluetoothHandler {
             } else if (characteristicUUID.equals(MODEL_NUMBER_CHARACTERISTIC_UUID)) {
                 String modelNumber = parser.getStringValue(0);
                 Timber.i("Received modelnumber: %s", modelNumber);
+            } else if (characteristicUUID.equals(FIRMWARE_REV_CHARACTERISTIC_UUID)) {
+                String firmwareRev = parser.getStringValue(0);
+                Timber.i("Received firmware revision: %s", firmwareRev);
+            } else if (characteristicUUID.equals(HARDWARE_REV_CHARACTERISTIC_UUID)) {
+                String hardwareRev = parser.getStringValue(0);
+                Timber.i("Received hardware revision: %s", hardwareRev);
+            } else if (characteristicUUID.equals(SOFTWARE_REV_CHARACTERISTIC_UUID)) {
+                String softwareRev = parser.getStringValue(0);
+                Timber.i("Received software revision: %s", softwareRev);
+            } else if (characteristicUUID.equals(SYSTEM_ID_CHARACTERISTIC_UUID)) {
+                String systemID = parser.getStringValue(0);
+                Timber.i("Received system ID: %s", systemID);
+            } else if (characteristicUUID.equals(STEPCOUNT_CHARACTERISTIC_UUID)) {
+                Integer stepcount = parser.getIntValue(BluetoothBytesParser.FORMAT_UINT32);
+                Timber.d("received stepcount %d", stepcount);
+                Intent intent = new Intent(MEASUREMENT_STEPCOUNT);
+                intent.putExtra(MEASUREMENT_STEPCOUNT_EXTRA, stepcount);
+                sendMeasurement(intent, peripheral);
             }
         }
 
         @Override
         public void onMtuChanged(@NotNull BluetoothPeripheral peripheral, int mtu, @NotNull GattStatus status) {
             Timber.i("new MTU set: %d", mtu);
+        }
+
+        private void sendMeasurement(@NotNull Intent intent, @NotNull BluetoothPeripheral peripheral ) {
+            intent.putExtra(MEASUREMENT_EXTRA_PERIPHERAL, peripheral.getAddress());
+            context.sendBroadcast(intent);
         }
 
     };
@@ -193,25 +218,24 @@ class BluetoothHandler {
     private BluetoothHandler(Context context) {
         this.context = context;
 
-        // Plant a tree
-        // TODO: figure out why the fuck this doesn't work
-//        Timber.plant(new Timber.DebugTree());
-
         // Create BluetoothCentral
         central = new BluetoothCentralManager(context, bluetoothCentralManagerCallback, new Handler());
 
         // Scan for peripherals with a certain service UUIDs
-        central.startPairingPopupHack();
-        startScan();
+        try {
+            central.startPairingPopupHack();
+            startScan();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void startScan() {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                // ### add HRS = HeartRate service to scan UUIDs
-                // TODO: add step counter UUID ONLY into list
-                central.scanForPeripheralsWithServices(new UUID[]{});
+                central.scanForPeripheralsWithServices(new UUID[]{STEPCOUNT_SERVICE_UUID});
             }
         },1000);
     }

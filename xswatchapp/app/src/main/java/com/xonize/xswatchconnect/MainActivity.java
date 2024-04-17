@@ -1,4 +1,4 @@
-package com.xonize.xswatchconnect.main;
+package com.xonize.xswatchconnect;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -18,9 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.welie.blessed.BluetoothBytesParser;
 import com.welie.blessed.BluetoothCentralManager;
 import com.welie.blessed.BluetoothPeripheral;
-import com.xonize.xswatchconnect.R;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,10 +40,14 @@ public class MainActivity extends AppCompatActivity {
     private static final int ACCESS_LOCATION_REQUEST = 2;
     private final DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH);
 
+    private boolean hasAllPermissions = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Timber.plant(new Timber.DebugTree());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        measurementValue = findViewById(R.id.deviceconnectiondata);
         registerReceiver(stepcountDataReceiver, new IntentFilter(BluetoothHandler.MEASUREMENT_STEPCOUNT));
     }
 
@@ -51,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        checkPermissions();
 
         if (getBluetoothManager().getAdapter() != null) {
             if (!isBluetoothEnabled()) {
@@ -87,16 +92,15 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(stepcountDataReceiver);
     }
 
-
-
     private final BroadcastReceiver stepcountDataReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-//            BluetoothPeripheral peripheral = getPeripheral(intent.getStringExtra(BluetoothHandler.MEASUREMENT_EXTRA_PERIPHERAL));
-//            GlucoseMeasurement measurement = (GlucoseMeasurement) intent.getSerializableExtra(BluetoothHandler.MEASUREMENT_GLUCOSE_EXTRA);
-//            if (measurement != null) {
-//                measurementValue.setText(String.format(Locale.ENGLISH, "%.1f %s\n%s\n\nfrom %s", measurement.value, measurement.unit == GlucoseMeasurementUnit.MmolPerLiter ? "mmol/L" : "mg/dL", dateFormat.format(measurement.timestamp), peripheral.getName()));
-//            }
+            BluetoothPeripheral peripheral = getPeripheral(intent.getStringExtra(BluetoothHandler.MEASUREMENT_EXTRA_PERIPHERAL));
+            Integer value = (Integer) intent.getSerializableExtra(BluetoothHandler.MEASUREMENT_STEPCOUNT_EXTRA);
+            Timber.d("received value stepcount %d", value);
+            if (value != null) {
+                measurementValue.setText(String.format(Locale.ENGLISH, "%d from %s", value, peripheral.getName()));
+            }
         }
     };
 
@@ -133,8 +137,8 @@ public class MainActivity extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && targetSdkVersion >= Build.VERSION_CODES.S) {
             return new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT};
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && targetSdkVersion >= Build.VERSION_CODES.Q) {
-            return new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
-        } else return new String[]{Manifest.permission.ACCESS_COARSE_LOCATION};
+            return new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_SCAN};
+        } else return new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.BLUETOOTH_SCAN};
     }
 
     private void permissionsGranted() {
@@ -196,6 +200,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Timber.d("%d permissions given, %d request code", permissions.length, requestCode);
+        for (String perm : permissions) {
+            Timber.d("\tpermission given: %s", perm);
+        }
+        if (permissions.length == 0 || grantResults.length == 0) return;
+
 
         // Check if all permission were granted
         boolean allGranted = true;
@@ -207,6 +217,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (allGranted) {
+            hasAllPermissions = true;
             permissionsGranted();
         } else {
             new AlertDialog.Builder(MainActivity.this)

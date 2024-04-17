@@ -18,5 +18,6 @@ void setup() {
 }
 
 void loop() {
+  sc_loop();
   bt_loop();
 }

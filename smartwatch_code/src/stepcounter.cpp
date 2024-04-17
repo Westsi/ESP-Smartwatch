@@ -2,6 +2,7 @@
 #include "declarations.h"
 
 #include <Wire.h>
+#include <Arduino.h>
 #include "MPU6050_tockn.h"
 
 MPU6050 mpu(Wire);
@@ -19,11 +20,17 @@ void sc_setup() {
 }
 
 void sc_loop() {
-    if (millis() - timer > 1000) {
-        sc_read();
-        sc_write_serial();
-        timer = millis();
-        steps = millis() / 1000;
+    // if (millis() - timer > 1000) {
+    //     sc_read();
+    //     sc_write_serial();
+    //     timer = millis();
+    //     steps = millis() / 1000;
+    // }
+    int clicked = digitalRead(13);
+    if (clicked == LOW) {
+        steps++;
+        Serial.println("Button pressed");
+        delay(500);
     }
 }
 
@@ -52,5 +59,6 @@ void sc_write_serial() {
 }
 
 uint32_t getSteps() {
+    Serial.println(steps);
     return steps;
 }

@@ -48,6 +48,8 @@ bool oldDeviceConnected = false;
 std::string connAddr = "!!";
 uint16_t connectionID = 0;
 
+long ble_timer = 0;
+
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
         Serial.println("Device Connected");
@@ -77,13 +79,16 @@ void bt_setup() {
         BLECharacteristic::PROPERTY_READ   |
         BLECharacteristic::PROPERTY_NOTIFY
     );
+    batteryLevel->addDescriptor(new BLE2902());
 
     stepService = server->createService(STEP_SERVICE_UUID);
     stepCount = stepService->createCharacteristic(
         STEP_CHAR_UUID,
         BLECharacteristic::PROPERTY_READ   |
-        BLECharacteristic::PROPERTY_NOTIFY
+        BLECharacteristic::PROPERTY_NOTIFY |
+        BLECharacteristic::PROPERTY_INDICATE
     );
+    stepCount->addDescriptor(new BLE2902());
 
     deviceInfoService = server->createService(DEVICE_INFO_SERVICE_UUID);
     deviceInfoService->createCharacteristic(
@@ -131,6 +136,7 @@ void bt_setup() {
         BLECharacteristic::PROPERTY_NOTIFY |
         BLECharacteristic::PROPERTY_INDICATE
     );
+    command->addDescriptor(new BLE2902());
     
 
     batteryService->start();
@@ -152,10 +158,10 @@ void bt_setup() {
 }
 
 void bt_loop() {
-    if (deviceConnected) {
+    if (deviceConnected && (millis() - ble_timer > 1000)) {
+        ble_timer = millis();
         writeCharacteristics();
         writeDebugInfo();
-        delay(1000);
     }
     if (!deviceConnected && oldDeviceConnected) {
         delay(500);
@@ -171,8 +177,10 @@ void bt_loop() {
 void writeCharacteristics() {
     uint32_t steps = getSteps();
     stepCount->setValue(steps);
+    stepCount->notify();
     uint8_t batteryperc = getBatteryPercentage();
     batteryLevel->setValue(&batteryperc, 1);
+    batteryLevel->notify();
 }
 
 void writeDebugInfo() {
