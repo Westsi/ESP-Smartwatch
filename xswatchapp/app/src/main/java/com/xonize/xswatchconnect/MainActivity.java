@@ -1,5 +1,7 @@
 package com.xonize.xswatchconnect;
 
+// https://github.com/Bellafaire/Android-Companion-App-For-BLE-Devices/blob/master/SmartwatchCompanionAppV2/app/src/main/java/com/example/smartwatchcompanionappv2/MainActivity.java
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -40,10 +42,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int ACCESS_LOCATION_REQUEST = 2;
     private final DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH);
 
-    private boolean hasAllPermissions = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Says it can't resolve method in some cases but compiles and works fine.
         Timber.plant(new Timber.DebugTree());
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -217,7 +218,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (allGranted) {
-            hasAllPermissions = true;
             permissionsGranted();
         } else {
             new AlertDialog.Builder(MainActivity.this)
