@@ -17,6 +17,8 @@ import android.location.LocationManager;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationManagerCompat;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -57,13 +59,19 @@ public class MainActivity extends AppCompatActivity {
         // Says it can't resolve method in some cases but compiles and works fine.
         Timber.plant(new Timber.DebugTree());
         Timber.d("CREATED MAINACTIVITY");
-        new NLService();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         measurementValue = findViewById(R.id.deviceconnectiondata);
         txtView = findViewById(R.id.infodata);
         txtView.setText("Hello!");
         registerReceiver(stepcountDataReceiver, new IntentFilter(BluetoothHandler.MEASUREMENT_STEPCOUNT));
+        startService(new Intent(this, NLService.class));
+
+        if (!(NotificationManagerCompat.getEnabledListenerPackages(getApplicationContext()).contains(getApplicationContext().getPackageName()))) {
+            Intent intent = new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS");
+            startActivity(intent);
+
+        }
 
         nReceiver = new NotificationReceiver();
         IntentFilter filter = new IntentFilter();
@@ -252,17 +260,17 @@ public class MainActivity extends AppCompatActivity {
         if (allGranted) {
             permissionsGranted();
         } else {
-            new AlertDialog.Builder(MainActivity.this)
-                    .setTitle("Permission is required for scanning Bluetooth peripherals")
-                    .setMessage("Please grant permissions")
-                    .setPositiveButton("Retry", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            dialogInterface.cancel();
-                            checkPermissions();
-                        }
-                    })
-                    .create()
-                    .show();
+//            new AlertDialog.Builder(MainActivity.this)
+//                    .setTitle("Permission is required for scanning Bluetooth peripherals")
+//                    .setMessage("Please grant permissions")
+//                    .setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialogInterface, int i) {
+//                            dialogInterface.cancel();
+//                            checkPermissions();
+//                        }
+//                    })
+//                    .create()
+//                    .show();
         }
     }
 
@@ -285,7 +293,6 @@ public class MainActivity extends AppCompatActivity {
     class NotificationReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Timber.d("received notification in main");
             if (intent.hasExtra("notification_event")) {
                 String temp = intent.getStringExtra("notification_event");
                 if (!notificationData.contains(temp)) {
