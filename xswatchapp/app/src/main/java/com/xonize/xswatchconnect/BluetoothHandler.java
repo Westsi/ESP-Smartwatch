@@ -34,9 +34,9 @@ import static com.welie.blessed.BluetoothBytesParser.FORMAT_UINT8;
 class BluetoothHandler {
 
     // Intent constants
-    public static final String MEASUREMENT_STEPCOUNT = "xonize.measurement.stepcount";
-    public static final String MEASUREMENT_STEPCOUNT_EXTRA = "xonize.measurement.stepcount.extra";
-    public static final String MEASUREMENT_EXTRA_PERIPHERAL = "xonize.measurement.peripheral";
+    public static final String MEASUREMENT_STEPCOUNT = "xonize.xswatchconnect.measurement.stepcount";
+    public static final String MEASUREMENT_STEPCOUNT_EXTRA = "xonize.xswatchconnect.measurement.stepcount.extra";
+    public static final String MEASUREMENT_EXTRA_PERIPHERAL = "xonize.xswatchconnect.measurement.peripheral";
 
     // UUIDs for the Device Information service (DIS)
     private static final UUID DEVICE_INFORMATION_SERVICE_UUID = UUID.fromString("0000180A-0000-1000-8000-00805F9B34FB");
@@ -60,6 +60,8 @@ class BluetoothHandler {
     private static BluetoothHandler instance = null;
     private final Context context;
     private final Handler handler = new Handler();
+
+    public static boolean connected = false;
 
     // Callback for peripherals
     private final BluetoothPeripheralCallback peripheralCallback = new BluetoothPeripheralCallback() {
@@ -160,6 +162,7 @@ class BluetoothHandler {
         @Override
         public void onConnectedPeripheral(@NotNull BluetoothPeripheral peripheral) {
             Timber.i("connected to '%s'", peripheral.getName());
+            connected = true;
         }
 
         @Override
@@ -170,6 +173,7 @@ class BluetoothHandler {
         @Override
         public void onDisconnectedPeripheral(@NotNull final BluetoothPeripheral peripheral, final @NotNull HciStatus status) {
             Timber.i("disconnected '%s' with status %s", peripheral.getName(), status);
+            connected = false;
 
             // Reconnect to this device when it becomes available again
             handler.postDelayed(new Runnable() {

@@ -18,6 +18,8 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import com.welie.blessed.BluetoothBytesParser;
@@ -37,19 +39,41 @@ import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static MainActivity reference;
+
     private TextView measurementValue;
+
+    private TextView txtView;
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int ACCESS_LOCATION_REQUEST = 2;
     private final DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH);
+    public static String notificationData = "";
+
+    private NotificationReceiver nReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        reference = this;
         // Says it can't resolve method in some cases but compiles and works fine.
         Timber.plant(new Timber.DebugTree());
+        Timber.d("CREATED MAINACTIVITY");
+        new NLService();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         measurementValue = findViewById(R.id.deviceconnectiondata);
+        txtView = findViewById(R.id.infodata);
+        txtView.setText("Hello!");
         registerReceiver(stepcountDataReceiver, new IntentFilter(BluetoothHandler.MEASUREMENT_STEPCOUNT));
+
+        nReceiver = new NotificationReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(NLService.NOTIFICATION_ACTION);
+        registerReceiver(nReceiver, filter);
+
+        //get the current notifications by broadcasting an intent
+        Intent i = new Intent(NLService.GET_NOTIFICATION_INTENT);
+        i.putExtra("command", "list");
+        sendBroadcast(i);
     }
 
     @SuppressLint("MissingPermission")
@@ -110,6 +134,14 @@ public class MainActivity extends AppCompatActivity {
         return central.getPeripheral(peripheralAddress);
     }
 
+    public static void updateNotifications() {
+        notificationData = "";
+        Timber.d("Updating Notifications");
+        Intent i = new Intent(NLService.GET_NOTIFICATION_INTENT);
+        i.putExtra("command", "list");
+        reference.sendBroadcast(i);
+    }
+
     private void checkPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             String[] missingPermissions = getMissingPermissions(getRequiredPermissions());
@@ -136,10 +168,10 @@ public class MainActivity extends AppCompatActivity {
     private String[] getRequiredPermissions() {
         int targetSdkVersion = getApplicationInfo().targetSdkVersion;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && targetSdkVersion >= Build.VERSION_CODES.S) {
-            return new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT};
+            return new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.FOREGROUND_SERVICE};
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && targetSdkVersion >= Build.VERSION_CODES.Q) {
-            return new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.BLUETOOTH_SCAN};
-        } else return new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.BLUETOOTH_SCAN};
+            return new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.FOREGROUND_SERVICE};
+        } else return new String[]{Manifest.permission.ACCESS_COARSE_LOCATION};
     }
 
     private void permissionsGranted() {
@@ -231,6 +263,37 @@ public class MainActivity extends AppCompatActivity {
                     })
                     .create()
                     .show();
+        }
+    }
+
+    public static void updateStatusText() {
+        try {
+            reference.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                    String statusText = (BluetoothHandler.connected ? "Connected to device" : "Not connected to device")
+                            + "\nNotification Data: \n" + notificationData;
+                    reference.txtView.setText(statusText);
+                }
+            });
+        } catch (Exception e) {
+            String statusText = "Connecting";
+        }
+    }
+
+    class NotificationReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Timber.d("received notification in main");
+            if (intent.hasExtra("notification_event")) {
+                String temp = intent.getStringExtra("notification_event");
+                if (!notificationData.contains(temp)) {
+                    temp = intent.getStringExtra("notification_event") + "\n" + notificationData;
+                    notificationData = temp.replace("\n\n", "\n");
+                }
+                updateStatusText();
+            }
         }
     }
 }
