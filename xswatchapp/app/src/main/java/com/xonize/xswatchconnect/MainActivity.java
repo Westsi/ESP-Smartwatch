@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
     public static String notificationData = "";
 
     private NotificationReceiver nReceiver;
+    public static SpotifyReceiver sReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,10 +79,19 @@ public class MainActivity extends AppCompatActivity {
         filter.addAction(NLService.NOTIFICATION_ACTION);
         registerReceiver(nReceiver, filter);
 
+        sReceiver = new SpotifyReceiver();
+        IntentFilter sfilter = new IntentFilter();
+        sfilter.addAction("com.spotify.music.playbackstatechanged");
+        sfilter.addAction("com.spotify.music.metadatachanged");
+        sfilter.addAction("com.spotify.music.queuechanged");
+        registerReceiver(sReceiver, sfilter);
+
         //get the current notifications by broadcasting an intent
         Intent i = new Intent(NLService.GET_NOTIFICATION_INTENT);
         i.putExtra("command", "list");
         sendBroadcast(i);
+
+        updateStatusText();
     }
 
     @SuppressLint("MissingPermission")
@@ -281,7 +291,8 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
 
                     String statusText = (BluetoothHandler.connected ? "Connected to device" : "Not connected to device")
-                            + "\nNotification Data: \n" + notificationData;
+                            + "\nNotification Data: \n" + notificationData
+                            + "\nSpotify Data> \n" + sReceiver.getSongData();
                     reference.txtView.setText(statusText);
                 }
             });
