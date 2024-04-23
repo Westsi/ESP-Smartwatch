@@ -1,7 +1,5 @@
 package com.xonize.xswatchconnect;
 
-// https://github.com/Bellafaire/Android-Companion-App-For-BLE-Devices/blob/master/SmartwatchCompanionAppV2/app/src/main/java/com/example/smartwatchcompanionappv2/MainActivity.java
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -292,7 +290,7 @@ public class MainActivity extends AppCompatActivity {
 
                     String statusText = (BluetoothHandler.connected ? "Connected to device" : "Not connected to device")
                             + "\nNotification Data: \n" + notificationData
-                            + "\nSpotify Data> \n" + sReceiver.getSongData();
+                            + "\nSpotify Data: \n" + sReceiver.getSongData();
                     reference.txtView.setText(statusText);
                 }
             });
