@@ -77,11 +77,11 @@ public class NLService extends NotificationListenerService {
                         //parse the data out of the statusbar notification object and format it into a string
                         //format appName,Title;ExtraText,ExtraInfoText,ExtraSubText,ExtraTitle;Description;
                         String data = ifNotNull(getAppNameFromPkgName(context, sbn.getPackageName())) + "," //this comma is a feature
-                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_TITLE)).replace("\n", "").replace(";", ",") + ";"
-                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_TEXT)).replace("\n", "").replace(";", ",") + ";"
-                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_INFO_TEXT)).replace("\n", "").replace(";", ",") + ";"
-                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_SUB_TEXT)).replace("\n", "").replace(";", ",") + ";"
-                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_TITLE_BIG)).replace("\n", "").replace(";", ",") + ";";
+                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_TITLE)).replace("\n", "").replace(";", ",") + ";";
+//                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_TEXT)).replace("\n", "").replace(";", ",") + ";"
+//                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_INFO_TEXT)).replace("\n", "").replace(";", ",") + ";"
+//                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_SUB_TEXT)).replace("\n", "").replace(";", ",") + ";"
+//                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_TITLE_BIG)).replace("\n", "").replace(";", ",") + ";";
 
                         //remove non-ascii characters, i guess if you want emoji on your other device then keep this
                         data = data.replaceAll("[^\\p{ASCII}]", "");
