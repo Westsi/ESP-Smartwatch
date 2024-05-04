@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'com.xonize.xswatchconnect'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.xonize.xswatchconnect"
-        minSdk 23
-        targetSdk 32
+        minSdk 32
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 

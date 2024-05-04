@@ -28,6 +28,7 @@ import com.welie.blessed.BluetoothPeripheral;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,15 +56,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         reference = this;
+        getCodeCacheDir().setReadOnly();
+        new File(getFilesDir().getPath() + "/data/com.xonize.xswatchconnect/code_cache/.overlay/base.apk/classes3.dex").setReadOnly();
         // Says it can't resolve method in some cases but compiles and works fine.
         Timber.plant(new Timber.DebugTree());
-        Timber.d("CREATED MAINACTIVITY");
+//        Timber.d("CREATED MAINACTIVITY");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         measurementValue = findViewById(R.id.deviceconnectiondata);
         txtView = findViewById(R.id.infodata);
         txtView.setText("Hello!");
-        registerReceiver(stepcountDataReceiver, new IntentFilter(BluetoothHandler.MEASUREMENT_STEPCOUNT));
+        registerReceiver(stepcountDataReceiver, new IntentFilter(BluetoothHandler.MEASUREMENT_STEPCOUNT), RECEIVER_EXPORTED);
         startService(new Intent(this, NLService.class));
 
         if (!(NotificationManagerCompat.getEnabledListenerPackages(getApplicationContext()).contains(getApplicationContext().getPackageName()))) {
@@ -75,14 +78,14 @@ public class MainActivity extends AppCompatActivity {
         nReceiver = new NotificationReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction(NLService.NOTIFICATION_ACTION);
-        registerReceiver(nReceiver, filter);
+        registerReceiver(nReceiver, filter, RECEIVER_EXPORTED);
 
         sReceiver = new SpotifyReceiver();
         IntentFilter sfilter = new IntentFilter();
         sfilter.addAction("com.spotify.music.playbackstatechanged");
         sfilter.addAction("com.spotify.music.metadatachanged");
         sfilter.addAction("com.spotify.music.queuechanged");
-        registerReceiver(sReceiver, sfilter);
+        registerReceiver(sReceiver, sfilter, RECEIVER_EXPORTED);
 
         //get the current notifications by broadcasting an intent
         Intent i = new Intent(NLService.GET_NOTIFICATION_INTENT);
@@ -152,30 +155,26 @@ public class MainActivity extends AppCompatActivity {
 
     public static void updateNotifications() {
         notificationData = "";
-        Timber.d("Updating Notifications");
+//        Timber.d("Updating Notifications");
         Intent i = new Intent(NLService.GET_NOTIFICATION_INTENT);
         i.putExtra("command", "list");
         reference.sendBroadcast(i);
     }
 
     private void checkPermissions() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            String[] missingPermissions = getMissingPermissions(getRequiredPermissions());
-            if (missingPermissions.length > 0) {
-                requestPermissions(missingPermissions, ACCESS_LOCATION_REQUEST);
-            } else {
-                permissionsGranted();
-            }
+        String[] missingPermissions = getMissingPermissions(getRequiredPermissions());
+        if (missingPermissions.length > 0) {
+            requestPermissions(missingPermissions, ACCESS_LOCATION_REQUEST);
+        } else {
+            permissionsGranted();
         }
     }
 
     private String[] getMissingPermissions(String[] requiredPermissions) {
         List<String> missingPermissions = new ArrayList<>();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            for (String requiredPermission : requiredPermissions) {
-                if (getApplicationContext().checkSelfPermission(requiredPermission) != PackageManager.PERMISSION_GRANTED) {
-                    missingPermissions.add(requiredPermission);
-                }
+        for (String requiredPermission : requiredPermissions) {
+            if (getApplicationContext().checkSelfPermission(requiredPermission) != PackageManager.PERMISSION_GRANTED) {
+                missingPermissions.add(requiredPermission);
             }
         }
         return missingPermissions.toArray(new String[0]);
@@ -183,9 +182,9 @@ public class MainActivity extends AppCompatActivity {
 
     private String[] getRequiredPermissions() {
         int targetSdkVersion = getApplicationInfo().targetSdkVersion;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && targetSdkVersion >= Build.VERSION_CODES.S) {
+        if (targetSdkVersion >= Build.VERSION_CODES.S) {
             return new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.FOREGROUND_SERVICE};
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && targetSdkVersion >= Build.VERSION_CODES.Q) {
+        } else if (targetSdkVersion >= Build.VERSION_CODES.Q) {
             return new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.FOREGROUND_SERVICE};
         } else return new String[]{Manifest.permission.ACCESS_COARSE_LOCATION};
     }

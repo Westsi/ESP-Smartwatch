@@ -8,6 +8,8 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:required="true" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:required="true" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" android:required="true" />
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" android:required="true"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <application
         android:allowBackup="true"
@@ -43,6 +45,19 @@
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <receiver
+            android:name=".SpotifyReceiver"
+            android:enabled="true"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="com.spotify.music.playbackstatechanged"/>
+                <action android:name="com.spotify.music.metadatachanged"/>
+                <action android:name="com.spotify.music.queuechanged"/>
+            </intent-filter>
+
+        </receiver>
     </application>
 
 </manifest>

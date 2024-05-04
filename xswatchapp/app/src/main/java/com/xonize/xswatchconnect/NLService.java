@@ -7,12 +7,14 @@ package com.xonize.xswatchconnect;
 * */
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
@@ -28,12 +30,12 @@ public class NLService extends NotificationListenerService {
 
     @Override
     public void onCreate() {
-        Timber.d("CREATED NLSERVICE");
+//        Timber.d("CREATED NLSERVICE");
         super.onCreate();
         nlReceiver = new NLReceiver();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(GET_NOTIFICATION_INTENT);
-        registerReceiver(nlReceiver, intentFilter);
+        registerReceiver(nlReceiver, intentFilter, RECEIVER_EXPORTED);
     }
 
     @Override
@@ -63,7 +65,7 @@ public class NLService extends NotificationListenerService {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Timber.d("received notification in nlservice");
+//            Timber.d("received notification in nlservice");
             if (intent.getStringExtra("command").equals("clearall")) {
                 NLService.this.cancelAllNotifications();
             } else if (intent.getStringExtra("command").equals("list")) {
@@ -76,12 +78,19 @@ public class NLService extends NotificationListenerService {
                     try {
                         //parse the data out of the statusbar notification object and format it into a string
                         //format appName,Title;ExtraText,ExtraInfoText,ExtraSubText,ExtraTitle;Description;
-                        String data = ifNotNull(getAppNameFromPkgName(context, sbn.getPackageName())) + "," //this comma is a feature
-                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_TITLE)).replace("\n", "").replace(";", ",") + ";";
-//                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_TEXT)).replace("\n", "").replace(";", ",") + ";"
-//                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_INFO_TEXT)).replace("\n", "").replace(";", ",") + ";"
-//                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_SUB_TEXT)).replace("\n", "").replace(";", ",") + ";"
-//                                + ifNotNull(sbn.getNotification().extras.getString(Notification.EXTRA_TITLE_BIG)).replace("\n", "").replace(";", ",") + ";";
+                        Bundle extras = sbn.getNotification().extras;
+                        CharSequence title = extras.getCharSequence(Notification.EXTRA_TITLE, "");
+                        CharSequence text = extras.getCharSequence(Notification.EXTRA_TEXT, "");
+                        CharSequence infoText = extras.getCharSequence(Notification.EXTRA_INFO_TEXT, "");
+                        CharSequence subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT, "");
+                        CharSequence bigTitle = extras.getCharSequence(Notification.EXTRA_TITLE_BIG, "");
+                        String data = ifNotNull(getAppNameFromPkgName(context, sbn.getPackageName())) + ","
+                        + (title.length() == 0 ? "" : title + ",")
+                        + (text.length() == 0 ? "" : text + ",")
+                        + (infoText.length() == 0 ? "" : infoText + ",")
+                        + (subText.length() == 0 ? "" : subText + ",")
+                        + (bigTitle.length() == 0 ? "" : bigTitle) + "\n\n\n";
+
 
                         //remove non-ascii characters, i guess if you want emoji on your other device then keep this
                         data = data.replaceAll("[^\\p{ASCII}]", "");
@@ -94,7 +103,7 @@ public class NLService extends NotificationListenerService {
                         } catch (Exception e) {
 
                         }
-                        if (!data.contains("XSWatch Connect")) {
+                        if (!data.contains("XSWatch Connect") && !data.contains("Spotify")) {
                             i2.putExtra("notification_event", data + "\n");
                             sendBroadcast(i2);
                         }

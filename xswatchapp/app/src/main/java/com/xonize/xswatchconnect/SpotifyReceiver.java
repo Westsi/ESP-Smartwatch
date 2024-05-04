@@ -43,6 +43,7 @@ public class SpotifyReceiver extends BroadcastReceiver {
         long timeSentInMs = intent.getLongExtra("timeSent", 0L);
 
         String action = intent.getAction();
+        Timber.d("Got spotify data");
 
         //when there's a change in the spotify song get it's data
         //there's a lot of stuff here that's not used in the final string
@@ -54,12 +55,9 @@ public class SpotifyReceiver extends BroadcastReceiver {
             String trackName = intent.getStringExtra("track");
             int trackLengthInSec = intent.getIntExtra("length", 0);
 
+            songData = albumName + " - " + trackName + " - " + artistName;
+            songData = songData.replaceAll("[^\\p{ASCII}]", ""); //remove all non-ascii characters, they don't play well with UTF-8 encoding
 
-            //if we are currently playing a song then we need to update the song name
-            if (isPlaying) {
-                songData = trackName + "-" + artistName;
-                songData = songData.replaceAll("[^\\p{ASCII}]", ""); //remove all non-ascii characters, they don't play well with UTF-8 encoding
-            }
             Timber.d("Meta data changed, current songData: " + songData);
         } else if (action.equals(BroadcastTypes.PLAYBACK_STATE_CHANGED)) {
             isPlaying = intent.getBooleanExtra("playing", false);
