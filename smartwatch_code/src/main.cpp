@@ -21,4 +21,5 @@ void loop() {
   // sc_loop();
   // bt_loop();
   touch_loop();
+  screen_update();
 }
