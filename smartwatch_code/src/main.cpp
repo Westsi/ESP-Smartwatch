@@ -11,13 +11,14 @@ void setup() {
   // pinMode(CASE_BUTTON, INPUT);
   // sdc_setup();
   // sc_setup();
-  // touch_setup();
-  // screen_setup();
-  bt_setup();
+  touch_setup();
+  screen_setup();
+  // bt_setup();
   
 }
 
 void loop() {
-  sc_loop();
-  bt_loop();
+  // sc_loop();
+  // bt_loop();
+  touch_loop();
 }
