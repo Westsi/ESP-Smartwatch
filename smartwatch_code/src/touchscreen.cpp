@@ -52,7 +52,10 @@ void screen_update() {
 /*
 TODO: Screen Management System
 
-an array of Screens that have a setup method, an update method, an array of click methods at different coordinates
+an array of Screens that have a setup method, an update method, an array of interaction handlers at different coordinates or overall
+    e.g. swipe left on any screen is back etc.
 the screen update method just renders the current index into the screens array
 sprites are *dynamically updated* - HOW?
+
+TODO: antialiasing with fonts - default with sprites?
 */
