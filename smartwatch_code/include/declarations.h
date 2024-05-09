@@ -30,5 +30,7 @@
 #define HARDWARE_REV "0.1.0-testing.1"
 #define SYSTEM_ID "XSW-DEADBEEF1"
 
+#define TFT_XON_BLUE 0x3535
+
 
 #endif

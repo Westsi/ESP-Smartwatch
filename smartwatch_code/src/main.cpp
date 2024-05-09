@@ -3,6 +3,7 @@
 #include "stepcounter.h"
 #include "sdc.h"
 #include "touchscreen.h"
+#include "screens/homescreen.h"
 #include "ble.h"
 #include "declarations.h"
 
