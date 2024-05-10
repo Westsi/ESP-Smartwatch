@@ -17,13 +17,13 @@ void setup() {
   touch_setup();
   screen_setup();
   print_system_info();
-  // bt_setup();
+  bt_setup();
   
 }
 
 void loop() {
-  // sc_loop();
-  // bt_loop();
+  sc_loop();
+  bt_loop();
   touch_loop();
   screen_update();
 }

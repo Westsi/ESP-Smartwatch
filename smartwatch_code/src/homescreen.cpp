@@ -1,23 +1,34 @@
 #include "screens/homescreen.h"
 #include "touchscreen.h"
+#include "time.h"
 #include "declarations.h"
 #include <TFT_eSPI.h>
 
 void Homescreen::init(TFT_eSprite* spr, int width, int height) {
     iHLen = 0;
     this->spr = spr;
-    spr->loadFont(FontLight14);
+    spr->loadFont(FontLight20);
     spr->setColorDepth(8);
     spr->createSprite(width, height);
     spr->fillSprite(TFT_XON_BLUE);
     spr->setTextColor(TFT_BLACK, TFT_XON_BLUE, true);
     spr->setTextDatum(MC_DATUM);
     spr->setTextWrap(true);
-    spr->drawString("Xonize Smartwatch", 120, 120);
 }
 
 void Homescreen::update() {
-    Serial.println(millis());
+    time_t now;
+    char strftime_buf[64];
+    struct tm timeinfo;
+
+    time(&now);
+    setenv("TZ", "GMT", 1);
+    tzset();
+
+    localtime_r(&now, &timeinfo);
+    strftime(strftime_buf, sizeof(strftime_buf), "%H:%M:%S", &timeinfo);
+    // Serial.println(strftime_buf);
+    spr->drawString(strftime_buf, 120, 120);
 }
 
 void Homescreen::render() {

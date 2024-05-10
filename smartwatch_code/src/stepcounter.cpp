@@ -26,12 +26,12 @@ void sc_loop() {
     //     timer = millis();
     //     steps = millis() / 1000;
     // }
-    int clicked = digitalRead(13);
-    if (clicked == LOW) {
-        steps++;
-        Serial.println("Button pressed");
-        delay(500);
-    }
+    // int clicked = digitalRead(13);
+    // if (clicked == LOW) {
+    //     steps++;
+    //     Serial.println("Button pressed");
+    //     delay(500);
+    // }
 }
 
 void sc_read() {
