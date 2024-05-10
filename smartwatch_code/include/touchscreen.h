@@ -4,9 +4,6 @@
 #include <CST816S.h>
 #include <TFT_eSPI.h>
 
-#include "fonts/NotoSansBold36.h"
-#define AA_FONT_LARGE NotoSansBold36
-
 void touch_setup();
 void touch_loop();
 
@@ -39,5 +36,53 @@ class Screen {
         int iHLen;
 
 };
+
+// Fonts
+
+#include "fonts/Roboto_Light12.h"
+#define FontLight12 Roboto_Light12
+
+#include "fonts/Roboto_Light14.h"
+#define FontLight14 Roboto_Light14
+
+#include "fonts/Roboto_Light16.h"
+#define FontLight16 Roboto_Light16
+
+#include "fonts/Roboto_Light18.h"
+#define FontLight18 Roboto_Light18
+
+#include "fonts/Roboto_Light20.h"
+#define FontLight20 Roboto_Light20
+
+#include "fonts/Roboto_Light24.h"
+#define FontLight24 Roboto_Light24
+
+#include "fonts/Roboto_Light28.h"
+#define FontLight28 Roboto_Light28
+
+
+
+#include "fonts/Roboto12.h"
+#define Font12 Roboto12
+
+#include "fonts/Roboto14.h"
+#define Font14 Roboto14
+
+#include "fonts/Roboto16.h"
+#define Font16 Roboto16
+
+#include "fonts/Roboto18.h"
+#define Font18 Roboto18
+
+#include "fonts/Roboto20.h"
+#define Font20 Roboto20
+
+#include "fonts/Roboto24.h"
+#define Font24 Roboto24
+
+#include "fonts/Roboto28.h"
+#define Font28 Roboto28
+
+
 
 #endif

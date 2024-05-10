@@ -4,8 +4,6 @@
 #include <CST816S.h>
 #include <TFT_eSPI.h>
 
-#include "fonts/NotoSansBold36.h"
-#define AA_FONT_LARGE NotoSansBold36
 
 #include "declarations.h"
 
@@ -44,7 +42,7 @@ void touch_loop() {
 void screen_setup() {
     tft.begin();
     tft.setRotation(0);
-    tft.loadFont(AA_FONT_LARGE);
+    tft.loadFont(FontLight14);
     tft.fillScreen(TFT_GREEN);
     activeScreen.init(&sprite, 240, 240);
 }

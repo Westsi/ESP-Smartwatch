@@ -6,14 +6,14 @@
 void Homescreen::init(TFT_eSprite* spr, int width, int height) {
     iHLen = 0;
     this->spr = spr;
-    spr->loadFont(AA_FONT_LARGE); // FONT DOES NOT WORK
+    spr->loadFont(FontLight14);
     spr->setColorDepth(8);
     spr->createSprite(width, height);
     spr->fillSprite(TFT_BLUE);
-    spr->setTextColor(TFT_BLACK, TFT_BLUE, false);
-    spr->setTextSize(2);
+    spr->setTextColor(TFT_BLACK, TFT_BLUE, true);
+    spr->setTextDatum(MC_DATUM);
     spr->setTextWrap(true);
-    spr->drawString("Xonize Smartwatch", 40, 100);
+    spr->drawString("Xonize Smartwatch", 120, 120);
 }
 
 void Homescreen::update() {
