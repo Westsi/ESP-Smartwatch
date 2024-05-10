@@ -1,4 +1,4 @@
-21815722738988261
+21820868809935255
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -49489,6 +49489,27 @@ Wire_Pad_1x03
 0
 3
 3
+Connector_Wire_SMD
+Wire_Pad_1x04
+
+
+0
+4
+4
+Connector_Wire_SMD
+Wire_Pad_1x06
+
+
+0
+6
+6
+Connector_Wire_SMD
+Wire_Pad_1x07
+
+
+0
+7
+4
 Connector_Wuerth
 Wuerth_WR-WTB_64800211622_1x02_P1.50mm_Vertical
 Wuerth WR-WTB series connector, 64800211622 (https://katalog.we-online.com/em/datasheet/6480xx11622.pdf), generated with kicad-footprint-generator
