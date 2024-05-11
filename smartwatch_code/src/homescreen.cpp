@@ -18,7 +18,8 @@ void Homescreen::init(TFT_eSprite* spr, int width, int height) {
 
 void Homescreen::update() {
     time_t now;
-    char strftime_buf[64];
+    char hms_buf[64];
+    char dmy_buf[64];
     struct tm timeinfo;
 
     time(&now);
@@ -26,9 +27,11 @@ void Homescreen::update() {
     tzset();
 
     localtime_r(&now, &timeinfo);
-    strftime(strftime_buf, sizeof(strftime_buf), "%H:%M:%S", &timeinfo);
+    strftime(hms_buf, sizeof(hms_buf), "%H:%M:%S", &timeinfo);
+    strftime(dmy_buf, sizeof(dmy_buf), "%a %d/%m/%y", &timeinfo);
     // Serial.println(strftime_buf);
-    spr->drawString(strftime_buf, 120, 120);
+    spr->drawString(hms_buf, 120, 120);
+    spr->drawString(dmy_buf, 120, 140);
 }
 
 void Homescreen::render() {

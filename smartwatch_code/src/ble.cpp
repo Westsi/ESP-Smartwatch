@@ -29,6 +29,9 @@
 #define COMMAND_SERVICE_UUID "0dd0c28b-d173-43bf-9dce-f2446591366d"
 #define COMMAND_CHAR_UUID "fed4ded3-97f1-44ca-b7a3-116cf78d9e77"
 
+#define TIME_SERVICE_UUID "00001805-0000-1000-8000-00805F9B34FB"
+#define TIME_CHAR_UUID "00002A2B-0000-1000-8000-00805F9B34FB"
+
 BLEServer* server = NULL;
 
 BLEService* batteryService = NULL;
@@ -41,6 +44,9 @@ BLEService* deviceInfoService = NULL;
 
 BLEService* commandService = NULL;
 BLECharacteristic* command = NULL;
+
+BLEService* timeService = NULL;
+BLECharacteristic* timeCharac = NULL;
 
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
@@ -61,7 +67,18 @@ class MyServerCallbacks: public BLEServerCallbacks {
         Serial.println("Disconnected");
         deviceConnected = false;
     }
+};
 
+class MyCommandCharacteristicCallbacks: public BLECharacteristicCallbacks {
+	void onWrite(BLECharacteristic* commandChar) {
+        Serial.println("CALLED");
+        std::string cmd = commandChar->getValue();
+        // WHY DOES THIS NOT WORK
+        Serial.println(cmd.c_str());
+        if (cmd == "UPDATE_TIME") {
+            updateTime();
+        }
+    }
 };
 
 void bt_setup() {
@@ -137,18 +154,31 @@ void bt_setup() {
         BLECharacteristic::PROPERTY_INDICATE
     );
     command->addDescriptor(new BLE2902());
+    command->setCallbacks(new MyCommandCharacteristicCallbacks());
+
+    timeService = server->createService(TIME_SERVICE_UUID);
+    timeCharac = timeService->createCharacteristic(
+        TIME_CHAR_UUID,
+        BLECharacteristic::PROPERTY_READ   |
+        BLECharacteristic::PROPERTY_WRITE  |
+        BLECharacteristic::PROPERTY_NOTIFY |
+        BLECharacteristic::PROPERTY_INDICATE
+    );
+    timeCharac->addDescriptor(new BLE2902());
     
 
     batteryService->start();
     stepService->start();
     deviceInfoService->start();
     commandService->start();
+    timeService->start();
 
     BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
     pAdvertising->addServiceUUID(BATTERY_SERVICE_UUID);
     pAdvertising->addServiceUUID(DEVICE_INFO_SERVICE_UUID);
     pAdvertising->addServiceUUID(STEP_SERVICE_UUID);
     pAdvertising->addServiceUUID(COMMAND_SERVICE_UUID);
+    pAdvertising->addServiceUUID(TIME_SERVICE_UUID);
     pAdvertising->setScanResponse(true);
     pAdvertising->setMinPreferred(0x06);
     pAdvertising->setMinPreferred(0x12);
@@ -187,4 +217,16 @@ void writeDebugInfo() {
     connAddr = ((BLEClient*)server->getPeerDevices(true)[connectionID].peer_device)->getPeerAddress().toString();
     Serial.print("Connected to ");
     Serial.println(connAddr.c_str());
+}
+
+void updateTime() {
+    std::string t = timeCharac->getValue();
+    time_t tt = stoi(t);
+    timeval tval;
+    tval.tv_sec = tt;
+    tval.tv_usec = 0;
+    timezone tz;
+    tz.tz_dsttime = 0; // TODO: CHANGE WITH TIMEZONE
+    tz.tz_minuteswest = 0;
+    settimeofday(&tval, &tz);
 }
