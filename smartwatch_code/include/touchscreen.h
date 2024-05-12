@@ -10,7 +10,7 @@ void touch_loop();
 void screen_setup();
 void screen_update();
 
-typedef bool(*InteractionCallback)(String, int, int);
+typedef void(*InteractionCallback)(String gesture, int x, int y);
 
 typedef struct IH {
     InteractionCallback callback;
