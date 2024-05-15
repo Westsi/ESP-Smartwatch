@@ -9,7 +9,8 @@
 
 TFT_eSPI tft = TFT_eSPI();
 CST816S touch(TOUCH_SDA, TOUCH_SCL, TOUCH_RST, TOUCH_IRQ); // sda, scl, rst, irq
-Screen* activeScreen;
+Homescreen hs = Homescreen();
+Screen* activeScreen = &hs;
 TFT_eSprite sprite = TFT_eSprite(&tft);
 
 void touch_setup() {
@@ -44,7 +45,6 @@ void screen_setup() {
     tft.setRotation(0);
     tft.loadFont(FontLight14);
     tft.fillScreen(TFT_GREEN);
-    activeScreen = &Homescreen();
     activeScreen->init(&sprite, 240, 240);
 }
 
