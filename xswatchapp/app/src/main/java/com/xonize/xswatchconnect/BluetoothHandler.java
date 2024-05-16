@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.SystemClock;
 
 import com.welie.blessed.BluetoothBytesParser;
 import com.welie.blessed.BluetoothCentralManager;
@@ -20,15 +21,22 @@ import com.welie.blessed.GattStatus;
 import com.welie.blessed.HciStatus;
 
 import com.welie.blessed.ScanFailure;
+import com.welie.blessed.WriteType;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import timber.log.Timber;
 
 import static com.welie.blessed.BluetoothBytesParser.FORMAT_UINT8;
+import static com.welie.blessed.BluetoothBytesParser.string2bytes;
 
 
 class BluetoothHandler {
@@ -55,6 +63,12 @@ class BluetoothHandler {
     private static final UUID STEPCOUNT_SERVICE_UUID = UUID.fromString("00001809-0000-1000-8000-00805F9B34FB");
     private static final UUID STEPCOUNT_CHARACTERISTIC_UUID = UUID.fromString("00002B40-0000-1000-8000-00805F9B34FB");
 
+    private static final UUID COMMAND_SERVICE_UUID = UUID.fromString("0dd0c28b-d173-43bf-9dce-f2446591366d");
+    private static final UUID COMMAND_CHAR_UUID = UUID.fromString("fed4ded3-97f1-44ca-b7a3-116cf78d9e77");
+
+    private static final UUID TIME_SERVICE_UUID = UUID.fromString("00001805-0000-1000-8000-00805F9B34FB");
+    private static final UUID TIME_CHAR_UUID = UUID.fromString("00002A2B-0000-1000-8000-00805F9B34FB");
+
     // Local variables
     public BluetoothCentralManager central;
     private static BluetoothHandler instance = null;
@@ -71,6 +85,19 @@ class BluetoothHandler {
             peripheral.requestMtu(185);
             // Request a new connection priority
             peripheral.requestConnectionPriority(ConnectionPriority.HIGH);
+
+            // Send Time Data to sync device time
+            long seconds;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                seconds = SystemClock.currentNetworkTimeClock().millis() / 1000;
+            } else {
+                seconds = System.currentTimeMillis() / 1000;
+            }
+            int offset  = ZonedDateTime.now().getOffset().getTotalSeconds();
+            long overallSeconds = seconds + offset;
+            byte[] secs = String.valueOf(overallSeconds).getBytes();
+            peripheral.writeCharacteristic(TIME_SERVICE_UUID, TIME_CHAR_UUID, secs, WriteType.WITH_RESPONSE);
+            peripheral.writeCharacteristic(COMMAND_SERVICE_UUID, COMMAND_CHAR_UUID, "UPDATE_TIME".getBytes(StandardCharsets.UTF_8), WriteType.WITH_RESPONSE);
 
             // Read info from the Device Information Service
             peripheral.readCharacteristic(DEVICE_INFORMATION_SERVICE_UUID, MANUFACTURER_NAME_CHARACTERISTIC_UUID);

@@ -7,4 +7,7 @@ void bt_loop();
 void writeCharacteristics();
 void writeDebugInfo();
 
+void updateTime();
+void handleReceivedData(std::string data);
+
 #endif
