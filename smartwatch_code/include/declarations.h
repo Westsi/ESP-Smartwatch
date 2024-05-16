@@ -31,7 +31,7 @@
 #define SYSTEM_ID "XSW-DEADBEEF1"
 
 #define TFT_XON_BLUE 0x3535 // #37a4ad
-#define TFT_XON_DARK_BLUE 0x3bf0 // #377e82
+#define TFT_XON_DARK_BLUE 0x3cf4 // #379da8
 // https://rgbcolorpicker.com/565
 
 

@@ -8,9 +8,12 @@ void testHandler(String gesture, int x, int y);
 
 float sx = 0, sy = 1, mx = 1, my = 0, hx = -1, hy = 0; // x and y multipliers for hours, minutes, seconds
 float hours_deg = 0, mins_deg = 0, secs_deg = 0;
-uint16_t osx=120, osy=120, omx=120, omy=120, ohx=120, ohy=120; // origins for x and y for hours, mins, secs TODO: I THINK
+uint16_t osx = 120, osy = 120, omx = 120, omy = 120, ohx = 120, ohy = 120;
 uint16_t x0 = 0, x1 = 0, yy0 = 0, yy1 = 0;
 bool initial = 1;
+
+uint16_t hhLenScale = 45, mhLenScale = 84, shLenScale = 90;
+uint16_t hhWidth = 20, mhWidth = 6, shWidth = 3;
 
 void Homescreen::init(TFT_eSprite* spr, int width, int height) {
     // setup
@@ -60,25 +63,23 @@ void Homescreen::update() {
     if (secs == 0 || initial) {
         initial = 0;
         // Erase hour and minute hand positions every minute
-        spr->drawWideLine(ohx, ohy, 120, 121, 17, TFT_BLACK);
-        ohx = hx*62+121;
-        ohy = hy*62+121;
-        spr->drawWideLine(omx, omy, 120, 121, 8, TFT_BLACK);
-        omx = mx*84+120;    
-        omy = my*84+121;
+        spr->drawWideLine(ohx, ohy, 120, 121, hhWidth+2, TFT_BLACK);
+        ohx = hx*hhLenScale+121;
+        ohy = hy*hhLenScale+121;
+        spr->drawWideLine(omx, omy, 120, 121, mhWidth+2, TFT_BLACK);
+        omx = mx*mhLenScale+120;    
+        omy = my*mhLenScale+121;
     }
 
     // Redraw new hand positions, hour and minute hands not erased here to avoid flicker
 
-    // TODO: FIGURE OUT HOW TO CHANGE HAND LENGTH
-    // https://m.media-amazon.com/images/I/61IZjvmSwDL._AC_UF1000,1000_QL80_.jpg
-    spr->drawWideLine(osx, osy, 120, 121, 4, TFT_BLACK);
-    osx = sx*90+121;    
-    osy = sy*90+121;
-    spr->drawWideLine(osx, osy, 120, 121, 3, TFT_XON_BLUE);
-    spr->drawWideLine(ohx, ohy, 120, 121, 15, TFT_XON_DARK_BLUE);
-    spr->drawWideLine(omx, omy, 120, 121, 6, TFT_WHITE);
-    spr->drawWideLine(osx, osy, 120, 121, 3, TFT_XON_BLUE);
+    spr->drawWideLine(osx, osy, 120, 121, shWidth+2, TFT_BLACK);
+    osx = sx*shLenScale+121;    
+    osy = sy*shLenScale+121;
+    spr->drawWideLine(osx, osy, 120, 121, shWidth, TFT_XON_DARK_BLUE);
+    spr->drawWideLine(ohx, ohy, 120, 121, hhWidth, TFT_XON_BLUE);
+    spr->drawWideLine(omx, omy, 120, 121, mhWidth, TFT_WHITE);
+    spr->drawWideLine(osx, osy, 120, 121, shWidth, TFT_XON_DARK_BLUE);
 
     // spr->drawString(hms_buf, 120, 120);
     spr->drawString(dmy_buf, 120, 140);

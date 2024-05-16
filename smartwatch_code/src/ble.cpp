@@ -3,6 +3,7 @@
 #include "declarations.h"
 #include "stepcounter.h"
 #include "hardware_interface.h"
+#include "notifications.h"
 
 #include <Arduino.h>
 #include <string>
@@ -51,6 +52,11 @@ BLECharacteristic* timeCharac = NULL;
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
 
+bool awaitingResponse = false;
+bool prevWaitStat = false;
+
+std::string responseStr;
+
 std::string connAddr = "!!";
 uint16_t connectionID = 0;
 
@@ -77,6 +83,10 @@ class MyCommandCharacteristicCallbacks: public BLECharacteristicCallbacks {
         Serial.println(cmd.c_str());
         if (cmd == "UPDATE_TIME") {
             updateTime();
+        } else {
+            if (awaitingResponse) {
+                handleReceivedData(std::string(cmd.c_str()));
+            }
         }
     }
 };
@@ -229,4 +239,12 @@ void updateTime() {
     tz.tz_dsttime = 0; // TODO: CHANGE WITH TIMEZONE
     tz.tz_minuteswest = 0;
     settimeofday(&tval, &tz);
+}
+
+void handleReceivedData(std::string data) {
+    if (data == "END_NOTIF") {
+        updateNotifications(parseNotification(responseStr));
+        responseStr.clear();
+    }
+    responseStr.append(data);
 }
