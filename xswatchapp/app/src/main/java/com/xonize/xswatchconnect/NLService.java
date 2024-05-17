@@ -84,12 +84,22 @@ public class NLService extends NotificationListenerService {
                         CharSequence infoText = extras.getCharSequence(Notification.EXTRA_INFO_TEXT, "");
                         CharSequence subText = extras.getCharSequence(Notification.EXTRA_SUB_TEXT, "");
                         CharSequence bigTitle = extras.getCharSequence(Notification.EXTRA_TITLE_BIG, "");
-                        String data = ifNotNull(getAppNameFromPkgName(context, sbn.getPackageName())) + ","
-                        + (title.length() == 0 ? "" : title + ",")
-                        + (text.length() == 0 ? "" : text + ",")
-                        + (infoText.length() == 0 ? "" : infoText + ",")
-                        + (subText.length() == 0 ? "" : subText + ",")
-                        + (bigTitle.length() == 0 ? "" : bigTitle) + "\n\n\n";
+//                        String data = ifNotNull(getAppNameFromPkgName(context, sbn.getPackageName())) + ","
+//                        + (title.length() == 0 ? "" : title + ",")
+//                        + (text.length() == 0 ? "" : text + ",")
+//                        + (infoText.length() == 0 ? "" : infoText + ",")
+//                        + (subText.length() == 0 ? "" : subText + ",")
+//                        + (bigTitle.length() == 0 ? "" : bigTitle) + "\n\n\n";
+
+                        if (title.length() == 0 && text.length() == 0) {
+                            continue;
+                        }
+
+                        String data = "~APP:" + ifNotNull(getAppNameFromPkgName(context, sbn.getPackageName()))
+                                + "~TITLE:" + (title.length() == 0 ? "" : title)
+                                + "~CONTENTS:" + (text.length() == 0 ? "" : text)
+                                + (infoText.length() == 0 ? "" : infoText)
+                                + (subText.length() == 0 ? "" : subText);
 
 
                         //remove non-ascii characters, i guess if you want emoji on your other device then keep this

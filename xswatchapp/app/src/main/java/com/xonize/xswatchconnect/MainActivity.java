@@ -49,9 +49,11 @@ public class MainActivity extends AppCompatActivity {
     private static final int ACCESS_LOCATION_REQUEST = 2;
     private final DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH);
     public static String notificationData = "";
+    public static ArrayList<String> notifications = new ArrayList<>();
 
     private NotificationReceiver nReceiver;
     public static SpotifyReceiver sReceiver;
+    public CommandDataReceiver commandDataReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +81,11 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(NLService.NOTIFICATION_ACTION);
         registerReceiver(nReceiver, filter, RECEIVER_EXPORTED);
+
+        commandDataReceiver = new CommandDataReceiver();
+        IntentFilter cfilter = new IntentFilter();
+        cfilter.addAction(BluetoothHandler.COMMAND_CHANNEL);
+        registerReceiver(commandDataReceiver, cfilter, RECEIVER_EXPORTED);
 
         sReceiver = new SpotifyReceiver();
         IntentFilter sfilter = new IntentFilter();
@@ -148,13 +155,14 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private BluetoothPeripheral getPeripheral(String peripheralAddress) {
+    public BluetoothPeripheral getPeripheral(String peripheralAddress) {
         BluetoothCentralManager central = BluetoothHandler.getInstance(getApplicationContext()).central;
         return central.getPeripheral(peripheralAddress);
     }
 
     public static void updateNotifications() {
         notificationData = "";
+        notifications.clear();
 //        Timber.d("Updating Notifications");
         Intent i = new Intent(NLService.GET_NOTIFICATION_INTENT);
         i.putExtra("command", "list");
@@ -306,6 +314,9 @@ public class MainActivity extends AppCompatActivity {
                 if (!notificationData.contains(temp)) {
                     temp = intent.getStringExtra("notification_event") + "\n" + notificationData;
                     notificationData = temp.replace("\n\n", "\n");
+                }
+                if (!notifications.contains(temp)) {
+                    notifications.add(temp);
                 }
                 updateStatusText();
             }

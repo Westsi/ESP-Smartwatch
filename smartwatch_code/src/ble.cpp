@@ -25,7 +25,7 @@
 #define FIRMWARE_REV_CHAR_UUID "00002A26-0000-1000-8000-00805F9B34FB"   // string, SOAFAI
 #define HARDWARE_REV_CHAR_UUID "00002A27-0000-1000-8000-00805F9B34FB"   // string, SOAFAI
 #define SOFTWARE_REV_CHAR_UUID "00002A28-0000-1000-8000-00805F9B34FB"   // string, SOAFAI
-#define SYSTEM_ID_CHAR_UUID "00002A23-0000-1000-8000-00805F9B34FB"      // IDK, SOAFAI
+#define SYSTEM_ID_CHAR_UUID "00002A23-0000-1000-8000-00805F9B34FB"      // string works, SOAFAI
 
 #define COMMAND_SERVICE_UUID "0dd0c28b-d173-43bf-9dce-f2446591366d"
 #define COMMAND_CHAR_UUID "fed4ded3-97f1-44ca-b7a3-116cf78d9e77"
@@ -77,10 +77,9 @@ class MyServerCallbacks: public BLEServerCallbacks {
 
 class MyCommandCharacteristicCallbacks: public BLECharacteristicCallbacks {
 	void onWrite(BLECharacteristic* commandChar) {
-        Serial.println("CALLED");
         std::string cmd = commandChar->getValue();
         // WHY DOES THIS NOT WORK
-        Serial.println(cmd.c_str());
+        // Serial.println(cmd.c_str());
         if (cmd == "UPDATE_TIME") {
             updateTime();
         } else {
@@ -88,6 +87,10 @@ class MyCommandCharacteristicCallbacks: public BLECharacteristicCallbacks {
                 handleReceivedData(std::string(cmd.c_str()));
             }
         }
+    }
+
+    void onRead(BLECharacteristic* characteristic) {
+        Serial.println("Value read from characteristic");
     }
 };
 
@@ -225,8 +228,8 @@ void writeCharacteristics() {
 
 void writeDebugInfo() {
     connAddr = ((BLEClient*)server->getPeerDevices(true)[connectionID].peer_device)->getPeerAddress().toString();
-    Serial.print("Connected to ");
-    Serial.println(connAddr.c_str());
+    // Serial.print("Connected to ");
+    // Serial.println(connAddr.c_str());
 }
 
 void updateTime() {
@@ -242,9 +245,26 @@ void updateTime() {
 }
 
 void handleReceivedData(std::string data) {
+    Serial.printf("RECEIVED DATA: \n\t");
+    Serial.println(data.c_str());
     if (data == "END_NOTIF") {
-        updateNotifications(parseNotification(responseStr));
+        Notification* notif = parseNotification(responseStr);
+        updateNotifications(notif);
         responseStr.clear();
+        return;
+    } else if (data ==  "END_ALL") {
+        responseStr.clear();
+        return;
     }
-    responseStr.append(data);
+    responseStr += data;
+}
+
+void sendCommand(std::string cmd) {
+    if (cmd.length() >= 256) {
+        Serial.println("Command too long!");
+    }
+    command->setValue(cmd);
+    command->notify();
+    Serial.println("Sent command");
+    awaitingResponse = true;
 }

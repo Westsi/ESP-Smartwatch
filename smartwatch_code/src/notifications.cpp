@@ -7,11 +7,15 @@ Notification* notifications[64];
 int idx = 0;
 
 void updateNotifications(Notification* notif) {
+    if (notif->app == "MISFORMATTED" || notif->contents == "MISFORMATTED" || notif->title == "MISFORMATTED") return;
     notifications[idx++] = notif;
 }
 
 Notification* parseNotification(std::string text) {
+    Serial.println("CALLED PARSE NOTIFICATION");
     Notification* n = new Notification();
+    Serial.println("Notification Text:");
+    Serial.printf("\t%s\n", text.c_str());
     // get start indices of sections
     int appIndex = text.find("~APP:");
     if (appIndex == std::string::npos) {
@@ -29,7 +33,7 @@ Notification* parseNotification(std::string text) {
         n->title = "MISFORMATTED";
         return n;
     }
-    int contentsIndex = text.find("~TEXT:");
+    int contentsIndex = text.find("~CONTENTS:");
     if (contentsIndex == std::string::npos) {
         Serial.println("misformatted contents in notification");
         n->app = "MISFORMATTED";
@@ -52,7 +56,9 @@ Notification* parseNotification(std::string text) {
 
     n->app = text.substr(appIndex+5, titleIndex-(appIndex+5));
     n->title = text.substr(titleIndex+7, contentsIndex-(titleIndex+7));
-    n->contents = text.substr(contentsIndex+6); // runs to end of string
+    n->contents = text.substr(contentsIndex+10); // runs to end of string
+
+    Serial.printf("Parsed notification successfully\nApp: %s, Title: %s, Contents: %s\n", n->app.c_str(), n->title.c_str(), n->contents.c_str());
 
     return n;
 }

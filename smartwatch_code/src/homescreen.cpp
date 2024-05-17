@@ -2,6 +2,7 @@
 #include "touchscreen.h"
 #include "time.h"
 #include "declarations.h"
+#include "ble.h"
 #include <TFT_eSPI.h>
 
 void testHandler(String gesture, int x, int y);
@@ -82,7 +83,7 @@ void Homescreen::update() {
     spr->drawWideLine(osx, osy, 120, 121, shWidth, TFT_XON_DARK_BLUE);
 
     // spr->drawString(hms_buf, 120, 120);
-    spr->drawString(dmy_buf, 120, 140);
+    // spr->drawString(dmy_buf, 120, 140);
 }
 
 void Homescreen::render() {
@@ -127,7 +128,8 @@ void testHandler(String gesture, int x, int y) {
 
     }
     else if (gesture == "SINGLE CLICK") {
-
+        Serial.println("Updating notifs");
+        sendCommand("UPDATE_NOTIFS");
     }
     else if (gesture == "DOUBLE CLICK") {
 

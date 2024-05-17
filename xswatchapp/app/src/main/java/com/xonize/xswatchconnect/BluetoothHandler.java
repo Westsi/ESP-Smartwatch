@@ -41,9 +41,14 @@ import static com.welie.blessed.BluetoothBytesParser.string2bytes;
 
 class BluetoothHandler {
 
+    public static int MTU = 0;
+
     // Intent constants
     public static final String MEASUREMENT_STEPCOUNT = "xonize.xswatchconnect.measurement.stepcount";
     public static final String MEASUREMENT_STEPCOUNT_EXTRA = "xonize.xswatchconnect.measurement.stepcount.extra";
+
+    public static final String COMMAND_CHANNEL = "xonize.xswatchconnect.channel.command";
+    public static final String COMMAND_CHANNEL_EXTRA = "xonize.xswatchconnect.channel.command.extra";
     public static final String MEASUREMENT_EXTRA_PERIPHERAL = "xonize.xswatchconnect.measurement.peripheral";
 
     // UUIDs for the Device Information service (DIS)
@@ -63,8 +68,8 @@ class BluetoothHandler {
     private static final UUID STEPCOUNT_SERVICE_UUID = UUID.fromString("00001809-0000-1000-8000-00805F9B34FB");
     private static final UUID STEPCOUNT_CHARACTERISTIC_UUID = UUID.fromString("00002B40-0000-1000-8000-00805F9B34FB");
 
-    private static final UUID COMMAND_SERVICE_UUID = UUID.fromString("0dd0c28b-d173-43bf-9dce-f2446591366d");
-    private static final UUID COMMAND_CHAR_UUID = UUID.fromString("fed4ded3-97f1-44ca-b7a3-116cf78d9e77");
+    public static final UUID COMMAND_SERVICE_UUID = UUID.fromString("0dd0c28b-d173-43bf-9dce-f2446591366d");
+    public static final UUID COMMAND_CHAR_UUID = UUID.fromString("fed4ded3-97f1-44ca-b7a3-116cf78d9e77");
 
     private static final UUID TIME_SERVICE_UUID = UUID.fromString("00001805-0000-1000-8000-00805F9B34FB");
     private static final UUID TIME_CHAR_UUID = UUID.fromString("00002A2B-0000-1000-8000-00805F9B34FB");
@@ -111,6 +116,7 @@ class BluetoothHandler {
             // Try to turn on notifications for other characteristics
             peripheral.readCharacteristic(BATTERY_LEVEL_SERVICE_UUID, BATTERY_LEVEL_CHARACTERISTIC_UUID);
             peripheral.setNotify(STEPCOUNT_SERVICE_UUID, STEPCOUNT_CHARACTERISTIC_UUID, true);
+            peripheral.setNotify(COMMAND_SERVICE_UUID, COMMAND_CHAR_UUID, true);
         }
 
         @Override
@@ -136,7 +142,10 @@ class BluetoothHandler {
 
         @Override
         public void onCharacteristicUpdate(@NotNull BluetoothPeripheral peripheral, @NotNull byte[] value, @NotNull BluetoothGattCharacteristic characteristic, @NotNull GattStatus status) {
-            if (status != GattStatus.SUCCESS) return;
+            if (status != GattStatus.SUCCESS) {
+                Timber.e("UNSUCCESSFUL CHARACTERISTIC UPDATE");
+                return;
+            }
 
             UUID characteristicUUID = characteristic.getUuid();
             BluetoothBytesParser parser = new BluetoothBytesParser(value);
@@ -164,9 +173,14 @@ class BluetoothHandler {
                 Timber.i("Received system ID: %s", systemID);
             } else if (characteristicUUID.equals(STEPCOUNT_CHARACTERISTIC_UUID)) {
                 Integer stepcount = parser.getIntValue(BluetoothBytesParser.FORMAT_UINT32);
-                Timber.d("received stepcount %d", stepcount);
+//                Timber.d("received stepcount %d", stepcount);
                 Intent intent = new Intent(MEASUREMENT_STEPCOUNT);
                 intent.putExtra(MEASUREMENT_STEPCOUNT_EXTRA, stepcount);
+                sendMeasurement(intent, peripheral);
+            } else if (characteristicUUID.equals(COMMAND_CHAR_UUID)) {
+                Intent intent = new Intent(COMMAND_CHANNEL);
+                String command = parser.getStringValue();
+                intent.putExtra(COMMAND_CHANNEL_EXTRA, command);
                 sendMeasurement(intent, peripheral);
             }
         }
@@ -174,6 +188,7 @@ class BluetoothHandler {
         @Override
         public void onMtuChanged(@NotNull BluetoothPeripheral peripheral, int mtu, @NotNull GattStatus status) {
             Timber.i("new MTU set: %d", mtu);
+            MTU = mtu;
         }
 
         private void sendMeasurement(@NotNull Intent intent, @NotNull BluetoothPeripheral peripheral ) {

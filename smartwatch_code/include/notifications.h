@@ -1,6 +1,9 @@
 #ifndef NOTIFICATIONS_H_
 #define NOTIFICATIONS_H_
 
+#include <Arduino.h>
+#include <string>
+
 class Notification {
     public:
         std::string title;

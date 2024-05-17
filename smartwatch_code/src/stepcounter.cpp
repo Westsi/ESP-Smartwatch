@@ -59,6 +59,6 @@ void sc_write_serial() {
 }
 
 uint32_t getSteps() {
-    Serial.println(steps);
+    // Serial.println(steps);
     return steps;
 }
