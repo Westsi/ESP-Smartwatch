@@ -245,8 +245,8 @@ void updateTime() {
 }
 
 void handleReceivedData(std::string data) {
-    Serial.printf("RECEIVED DATA: \n\t");
-    Serial.println(data.c_str());
+    // Serial.printf("RECEIVED DATA: \n\t");
+    // Serial.println(data.c_str());
     if (data == "END_NOTIF") {
         Notification* notif = parseNotification(responseStr);
         updateNotifications(notif);
