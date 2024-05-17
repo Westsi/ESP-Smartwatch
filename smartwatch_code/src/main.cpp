@@ -6,6 +6,7 @@
 #include "screens/homescreen.h"
 #include "ble.h"
 #include "declarations.h"
+#include "notifications.h"
 
 void print_system_info();
 
@@ -18,6 +19,10 @@ void setup() {
   bt_setup();
   touch_setup();
   screen_setup();
+  // zero notification array
+  for (int i=0;i<64;i++) {
+    notifications[i] = NULL;
+  }
 }
 
 void loop() {

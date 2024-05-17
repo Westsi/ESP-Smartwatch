@@ -70,5 +70,6 @@ Notification* getNotification(int index) {
 void deleteNotification(int index) {
     Notification* n = notifications[index];
     delete n;
-    notifications[index] = NULL;
+    notifications[index] = notifications[idx];
+    notifications[idx--] = NULL;
 }
