@@ -58,5 +58,6 @@ void screen_update() {
 }
 
 void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
-    activeScreen = &ns;
+    // TODO: IMPLEMENT
+    activeScreen = new_screen;
 }
