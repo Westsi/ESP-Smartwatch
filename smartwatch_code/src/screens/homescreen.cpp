@@ -6,7 +6,7 @@
 #include "ble.h"
 #include <TFT_eSPI.h>
 
-void fullScreenHandler(String gesture, int x, int y);
+void hsFullScreenHandler(String gesture, int x, int y);
 
 float sx = 0, sy = 1, mx = 1, my = 0, hx = -1, hy = 0; // x and y multipliers for hours, minutes, seconds
 float hours_deg = 0, mins_deg = 0, secs_deg = 0;
@@ -28,7 +28,7 @@ void Homescreen::init(TFT_eSprite* spr, int width, int height) {
     spr->setTextColor(TFT_WHITE, TFT_BLACK, true);
     spr->setTextDatum(MC_DATUM);
     spr->setTextWrap(true);
-    registerInteractionHandler(fullScreenHandler, 0, 240, 0, 240);
+    registerInteractionHandler(hsFullScreenHandler, 0, 240, 0, 240);
 
     // clock face
     spr->fillCircle(120, 120, 118, TFT_BLACK);
@@ -114,7 +114,7 @@ void Homescreen::handleInteraction(String gesture, int x, int y) {
     }
 }
 
-void fullScreenHandler(String gesture, int x, int y) {
+void hsFullScreenHandler(String gesture, int x, int y) {
     Serial.println("Test handler called");
     if (gesture == "SWIPE DOWN") {
         

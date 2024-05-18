@@ -8,7 +8,7 @@
 #include "notifications.h"
 
 void closeNotificationHandler(String gesture, int x, int y);
-void fullScreenHandler(String gesture, int x, int y);
+void nsFullScreenHandler(String gesture, int x, int y);
 
 void NotificationScreen::init(TFT_eSprite* spr, int width, int height) {
     // setup
@@ -22,7 +22,7 @@ void NotificationScreen::init(TFT_eSprite* spr, int width, int height) {
     spr->setTextDatum(MC_DATUM);
     spr->setTextWrap(true, true);
     registerInteractionHandler(closeNotificationHandler, 130, 170, 15, 45);
-    registerInteractionHandler(fullScreenHandler, 0, 240, 0, 240);
+    registerInteractionHandler(nsFullScreenHandler, 0, 240, 0, 240);
 }
 
 void NotificationScreen::update() {
@@ -86,7 +86,7 @@ void closeNotificationHandler(String gesture, int x, int y) {
     }
 }
 
-void fullScreenHandler(String gesture, int x, int y) {
+void nsFullScreenHandler(String gesture, int x, int y) {
     Serial.println("Test handler called");
     if (gesture == "SWIPE RIGHT") {
         animateSwitch(ANIMATE_IN_FROM_LEFT, &ns, &hs);
