@@ -11,25 +11,25 @@
 void print_system_info();
 
 void setup() {
-  Serial.begin(115200);
-  // pinMode(CASE_BUTTON, INPUT);
-  // sdc_setup();
-  // sc_setup();
-  print_system_info();
-  bt_setup();
-  touch_setup();
-  screen_setup();
-  // zero notification array
-  for (int i=0;i<64;i++) {
-    notifications[i] = NULL;
-  }
+    Serial.begin(115200);
+    // pinMode(CASE_BUTTON, INPUT);
+    // sdc_setup();
+    // sc_setup();
+    bt_setup();
+    touch_setup();
+    screen_setup();
+    // zero notification array
+    for (int i=0;i<64;i++) {
+        notifications[i] = NULL;
+    }
+    print_system_info();
 }
 
 void loop() {
-  sc_loop();
-  bt_loop();
-  touch_loop();
-  screen_update();
+    sc_loop();
+    bt_loop();
+    touch_loop();
+    screen_update();
 }
 
 void print_system_info() {

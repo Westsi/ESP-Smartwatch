@@ -8,6 +8,11 @@ int idx = 0;
 
 void updateNotifications(Notification* notif) {
     if (notif->app == "MISFORMATTED" || notif->contents == "MISFORMATTED" || notif->title == "MISFORMATTED") return;
+    for (int i=0;i<idx;i++) {
+        if (notifications[i]->app == notif->app && notifications[i]->contents == notif->contents && notifications[i]->title == notif->title) {
+            return; // identical notification already exists
+        }
+    }
     notifications[idx++] = notif;
 }
 
@@ -70,6 +75,23 @@ Notification* getNotification(int index) {
 void deleteNotification(int index) {
     Notification* n = notifications[index];
     delete n;
+    if (idx == 1) {
+        notifications[idx-1] = NULL;
+        return;
+    }
+    idx--;
     notifications[index] = notifications[idx];
-    notifications[idx--] = NULL;
+    Serial.printf("moving notif at %d to %d\n", idx, index);
+    notifications[idx] = NULL;
+}
+
+void printAllNotifications() {
+    Serial.printf("%d notifications in queue\n", idx);
+    for (int i=0;i<idx;i++) {
+        Notification* n = getNotification(i);
+        if (n == NULL) {
+            return;
+        }
+        Serial.printf("App: %s, Title: %s, Contents: %s\n", n->app.c_str(), n->title.c_str(), n->contents.c_str());
+    }
 }

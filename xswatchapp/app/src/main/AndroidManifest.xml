@@ -59,16 +59,16 @@
 
         </receiver>
 
-        <receiver
-            android:name=".CommandDataReceiver"
-            android:enabled="true"
-            android:exported="true">
+<!--        <receiver-->
+<!--            android:name=".CommandDataReceiver"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="true">-->
 
-            <intent-filter>
-                <action android:name="xonize.xswatchconnect.channel.command"/>
-            </intent-filter>
+<!--            <intent-filter>-->
+<!--                <action android:name="xonize.xswatchconnect.channel.command"/>-->
+<!--            </intent-filter>-->
 
-        </receiver>
+<!--        </receiver>-->
     </application>
 
 </manifest>

@@ -4,12 +4,6 @@
 #include <CST816S.h>
 #include <TFT_eSPI.h>
 
-void touch_setup();
-void touch_loop();
-
-void screen_setup();
-void screen_update();
-
 typedef void(*InteractionCallback)(String gesture, int x, int y);
 
 typedef struct IH {
@@ -36,6 +30,18 @@ class Screen {
         int iHLen;
 
 };
+
+enum AnimationSelect {
+    ANIMATE_IN_FROM_RIGHT,
+    ANIMATE_IN_FROM_LEFT
+};
+
+void touch_setup();
+void touch_loop();
+
+void screen_setup();
+void screen_update();
+void animateSwitch(AnimationSelect as, Screen* os, Screen* ns);
 
 // Fonts
 

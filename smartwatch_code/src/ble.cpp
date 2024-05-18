@@ -205,6 +205,7 @@ void bt_loop() {
         ble_timer = millis();
         writeCharacteristics();
         writeDebugInfo();
+        // printAllNotifications();
     }
     if (!deviceConnected && oldDeviceConnected) {
         delay(500);

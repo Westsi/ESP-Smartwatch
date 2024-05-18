@@ -18,5 +18,6 @@ Notification* parseNotification(std::string text);
 
 void deleteNotification(int index);
 Notification* getNotification(int index);
+void printAllNotifications();
 
 #endif

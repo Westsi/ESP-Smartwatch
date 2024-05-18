@@ -14,5 +14,7 @@ class NotificationScreen : public Screen {
         void handleInteraction(String gesture, int x, int y);
 };
 
+extern NotificationScreen ns;
+
 
 #endif

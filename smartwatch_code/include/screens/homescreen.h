@@ -14,5 +14,7 @@ class Homescreen : public Screen {
         void handleInteraction(String gesture, int x, int y);
 };
 
+extern Homescreen hs;
+
 
 #endif
