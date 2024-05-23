@@ -90,6 +90,64 @@ void animateSwitch(AnimationSelect as, Screen* os, Screen* ns);
 #include "fonts/Roboto28.h"
 #define Font28 Roboto28
 
+#include "fonts/Roboto64.h"
+#define Font64 Roboto64
+
+
+#include "fonts/JetBrainsMonoRegular12.h"
+#define FontMono12 JetBrainsMonoRegular12
+
+#include "fonts/JetBrainsMonoRegular14.h"
+#define FontMono14 JetBrainsMonoRegular14
+
+#include "fonts/JetBrainsMonoRegular16.h"
+#define FontMono16 JetBrainsMonoRegular16
+
+#include "fonts/JetBrainsMonoRegular18.h"
+#define FontMono18 JetBrainsMonoRegular18
+
+#include "fonts/JetBrainsMonoRegular20.h"
+#define FontMono20 JetBrainsMonoRegular20
+
+#include "fonts/JetBrainsMonoRegular24.h"
+#define FontMono24 JetBrainsMonoRegular24
+
+#include "fonts/JetBrainsMonoRegular28.h"
+#define FontMono28 JetBrainsMonoRegular28
+
+#include "fonts/JetBrainsMonoRegular48.h"
+#define FontMono48 JetBrainsMonoRegular48
+
+#include "fonts/JetBrainsMonoRegular64.h"
+#define FontMono64 JetBrainsMonoRegular64
+
+
+#include "fonts/Rubik12.h"
+#define FontRubik12 Rubik12
+
+#include "fonts/Rubik14.h"
+#define FontRubik14 Rubik14
+
+#include "fonts/Rubik16.h"
+#define FontRubik16 Rubik16
+
+#include "fonts/Rubik18.h"
+#define FontRubik18 Rubik18
+
+#include "fonts/Rubik20.h"
+#define FontRubik20 Rubik20
+
+#include "fonts/Rubik24.h"
+#define FontRubik24 Rubik24
+
+#include "fonts/Rubik28.h"
+#define FontRubik28 Rubik28
+
+#include "fonts/Rubik48.h"
+#define FontRubik48 Rubik48
+
+#include "fonts/Rubik64.h"
+#define FontRubik64 Rubik64
 
 
 #endif

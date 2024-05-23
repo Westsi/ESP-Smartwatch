@@ -1,5 +1,5 @@
 #include "screens/notificationscreen.h"
-#include "screens/homescreen.h"
+#include "screens/watchface.h"
 #include "touchscreen.h"
 #include "time.h"
 #include "declarations.h"
@@ -89,6 +89,6 @@ void closeNotificationHandler(String gesture, int x, int y) {
 void nsFullScreenHandler(String gesture, int x, int y) {
     Serial.println("Test handler called");
     if (gesture == "SWIPE RIGHT") {
-        animateSwitch(ANIMATE_IN_FROM_LEFT, &ns, &hs);
+        switchScr(&wf);
     }
 }

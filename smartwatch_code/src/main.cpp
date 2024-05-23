@@ -3,7 +3,7 @@
 #include "stepcounter.h"
 #include "sdc.h"
 #include "touchscreen.h"
-#include "screens/homescreen.h"
+#include "screens/watchface.h"
 #include "ble.h"
 #include "declarations.h"
 #include "notifications.h"
