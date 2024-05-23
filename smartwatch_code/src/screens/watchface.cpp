@@ -110,11 +110,11 @@ void Watchface::drawDigitalFace(struct tm timeinfo) {
     strftime(dmy_buf, sizeof(dmy_buf), "%a %d %b", &timeinfo);
     spr->fillScreen(TFT_BLACK);
     spr->unloadFont();
-    spr->loadFont(Font64);
+    spr->loadFont(FontRubik64);
     spr->setTextColor(TFT_XON_BLUE, TFT_BLACK, true);
     spr->drawString(hm_buf, 120, 80);
     spr->unloadFont();
-    spr->loadFont(Font28);
+    spr->loadFont(FontRubik28);
     spr->setTextColor(TFT_WHITE, TFT_BLACK, true);
     spr->drawString(ampm, 120, 130);
     spr->unloadFont();
