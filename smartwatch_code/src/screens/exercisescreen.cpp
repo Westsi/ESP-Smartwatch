@@ -1,4 +1,4 @@
-#include "screens/templatescreen.h"
+#include "screens/exercisescreen.h"
 #include "touchscreen.h"
 #include "time.h"
 #include "declarations.h"
@@ -8,7 +8,7 @@
 void snFullScreenHandler(String gesture, int x, int y);
 
 
-void SCREENNAME::init(TFT_eSprite* spr, int width, int height) {
+void ExerciseScreen::init(TFT_eSprite* spr, int width, int height) {
     // setup
     iHLen = 0;
     this->spr = spr;
@@ -20,29 +20,32 @@ void SCREENNAME::init(TFT_eSprite* spr, int width, int height) {
     spr->setTextDatum(MC_DATUM);
     spr->setTextWrap(true);
     registerInteractionHandler(snFullScreenHandler, 0, 240, 0, 240);
+
+    // clock face
+    spr->fillCircle(120, 120, 118, TFT_BLACK);
 }
 
-void SCREENNAME::update() {
+void ExerciseScreen::update() {
     
 }
 
-void SCREENNAME::render() {
+void ExerciseScreen::render() {
     this->update();
     spr->pushSprite(0, 0);
 }
 
-void SCREENNAME::registerInteractionHandler(InteractionCallback callback, int minx, int maxx, int miny, int maxy) {
+void ExerciseScreen::registerInteractionHandler(InteractionCallback callback, int minx, int maxx, int miny, int maxy) {
     InteractionHandler ih = InteractionHandler{.callback = callback, .minx = minx, .maxx = maxx, .miny = miny, .maxy = maxy};
     this->interactionHandlers[iHLen] = ih;
     iHLen++;
 }
 
-void SCREENNAME::registerInteractionHandler(InteractionHandler ih) {
+void ExerciseScreen::registerInteractionHandler(InteractionHandler ih) {
     this->interactionHandlers[iHLen] = ih;
     iHLen++;
 }
 
-void SCREENNAME::handleInteraction(String gesture, int x, int y) {
+void ExerciseScreen::handleInteraction(String gesture, int x, int y) {
     Serial.printf("%s interaction with watchface at %d %d\n", gesture, x, y);
     // loop through interaction handlers and check if gesture is within their bounds
     for (auto ih : interactionHandlers) {
