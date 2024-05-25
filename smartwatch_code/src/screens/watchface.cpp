@@ -1,5 +1,6 @@
 #include "screens/watchface.h"
 #include "screens/notificationscreen.h"
+#include "screens/exercisescreen.h"
 #include "touchscreen.h"
 #include "time.h"
 #include "declarations.h"
@@ -147,7 +148,7 @@ void Watchface::handleInteraction(String gesture, int x, int y) {
 void wfFullScreenHandler(String gesture, int x, int y) {
     Serial.println("Test handler called");
     if (gesture == "SWIPE DOWN") {
-        
+        switchScr(&es);
     }
     else if (gesture == "SWIPE UP") {
 

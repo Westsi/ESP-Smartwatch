@@ -1,11 +1,11 @@
 #include "screens/exercisescreen.h"
+#include "stepcounter.h"
 #include "touchscreen.h"
-#include "time.h"
 #include "declarations.h"
 #include "ble.h"
 #include <TFT_eSPI.h>
 
-void snFullScreenHandler(String gesture, int x, int y);
+void esFullScreenHandler(String gesture, int x, int y);
 
 
 void ExerciseScreen::init(TFT_eSprite* spr, int width, int height) {
@@ -19,14 +19,16 @@ void ExerciseScreen::init(TFT_eSprite* spr, int width, int height) {
     spr->setTextColor(TFT_WHITE, TFT_BLACK, true);
     spr->setTextDatum(MC_DATUM);
     spr->setTextWrap(true);
-    registerInteractionHandler(snFullScreenHandler, 0, 240, 0, 240);
+    registerInteractionHandler(esFullScreenHandler, 0, 240, 0, 240);
 
     // clock face
     spr->fillCircle(120, 120, 118, TFT_BLACK);
 }
 
 void ExerciseScreen::update() {
-    
+    long angle = map(getSteps(), 0, 100, 90, 270);
+    spr->drawSmoothArc(120, 120, 110, 100, 90, angle, TFT_RED, TFT_BLACK, true);
+    // x and y are centers, r is outer radius, ir is inner radius
 }
 
 void ExerciseScreen::render() {
@@ -56,7 +58,7 @@ void ExerciseScreen::handleInteraction(String gesture, int x, int y) {
     }
 }
 
-void snFullScreenHandler(String gesture, int x, int y) {
+void esFullScreenHandler(String gesture, int x, int y) {
     Serial.println("Test handler called");
     if (gesture == "SWIPE DOWN") {
         

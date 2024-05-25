@@ -1,6 +1,7 @@
 #include "touchscreen.h"
 #include "screens/watchface.h"
 #include "screens/notificationscreen.h"
+#include "screens/exercisescreen.h"
 
 #include <CST816S.h>
 #include <TFT_eSPI.h>
@@ -12,9 +13,11 @@ TFT_eSPI tft = TFT_eSPI();
 CST816S touch(TOUCH_SDA, TOUCH_SCL, TOUCH_RST, TOUCH_IRQ); // sda, scl, rst, irq
 Watchface wf = Watchface();
 NotificationScreen ns = NotificationScreen();
+ExerciseScreen es = ExerciseScreen();
 Screen* activeScreen = &wf;
 TFT_eSprite wfsprite = TFT_eSprite(&tft);
 TFT_eSprite nssprite = TFT_eSprite(&tft);
+TFT_eSprite essprite = TFT_eSprite(&tft);
 
 bool isAnimating = false;
 
@@ -52,6 +55,7 @@ void screen_setup() {
     tft.fillScreen(TFT_GREEN);
     wf.init(&wfsprite, 240, 240);
     ns.init(&nssprite, 240, 240);
+    es.init(&essprite, 240, 240);
 }
 
 int startMillis = 0;
