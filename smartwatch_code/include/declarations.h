@@ -17,6 +17,7 @@
 #define SCREEN_CS 5
 #define SCREEN_DC 19
 #define SCREEN_RST 15
+#define SCREEN_BL 4
 
 #define TOUCH_SDA 21
 #define TOUCH_SCL 22

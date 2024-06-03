@@ -60,11 +60,14 @@ void touch_loop() {
         enableSleepMode();
         // on return, sleep mode has been disabled
         timeOfLastInteraction = millis();
+        setScreenBrightness(255); // set to max brightness - TODO: change when config added
         hasJustWokenUp = true;
     }
 }
 
 void screen_setup() {
+    ledcSetup(0, 1000, 8); // setup pwm channel 0 with 1000 freq and 8 bit precision
+    ledcAttachPin(SCREEN_BL, 0); // connect screen backlight pin to pwm 0
     tft.begin();
     tft.setRotation(0);
     tft.loadFont(FontLight14);
@@ -90,6 +93,12 @@ void switchScr(Screen* new_screen) {
 
 void turnScreenOff() {
     tft.fillScreen(TFT_BLACK);
+    setScreenBrightness(0); // set to min brightness
+}
+
+// val is from 1-255, sent directly as PWM
+void setScreenBrightness(int val) {
+    ledcWrite(0, val); // write brightness to channel 0
 }
 
 void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {

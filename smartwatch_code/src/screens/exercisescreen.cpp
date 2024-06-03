@@ -2,6 +2,7 @@
 #include "stepcounter.h"
 #include "touchscreen.h"
 #include "declarations.h"
+#include "screens/watchface.h"
 #include "ble.h"
 #include <TFT_eSPI.h>
 
@@ -26,9 +27,16 @@ void ExerciseScreen::init(TFT_eSprite* spr, int width, int height) {
 }
 
 void ExerciseScreen::update() {
-    long angle = map(getSteps(), 0, 100, 90, 270);
-    spr->drawSmoothArc(120, 120, 110, 100, 90, angle, TFT_RED, TFT_BLACK, true);
+    long angle = map(getSteps(), 0, 100, 180, 540);
+    // spr->drawSmoothArc(120, 120, 110, 100, 90, angle, TFT_XON_BLUE, TFT_BLACK, true);
     // x and y are centers, r is outer radius, ir is inner radius
+    // arcs should be coloured, starting from north and going clockwise
+    // they should also be drawn on circles that are less grey than the background
+    spr->drawSmoothArc(120, 120, 50, 40, 0, 360, TFT_DARKGREY, TFT_BLACK, true); // draw grey background circle
+    if (angle >=540) { // full circle
+        spr->drawSmoothArc(120, 120, 50, 40, 0, 360, TFT_XON_BLUE, TFT_DARKGREY, false);
+    }
+    spr->drawSmoothArc(120, 120, 50, 40, 180, angle%360, TFT_XON_BLUE, TFT_DARKGREY, true);
 }
 
 void ExerciseScreen::render() {
@@ -64,7 +72,7 @@ void esFullScreenHandler(String gesture, int x, int y) {
         
     }
     else if (gesture == "SWIPE UP") {
-
+        switchScr(&wf);
     }
     else if (gesture == "SWIPE LEFT") {
 

@@ -43,6 +43,7 @@ void screen_setup();
 void screen_update();
 void switchScr(Screen* new_screen);
 void turnScreenOff();
+void setScreenBrightness(int val);
 void animateSwitch(AnimationSelect as, Screen* os, Screen* ns);
 
 // Fonts
