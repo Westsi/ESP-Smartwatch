@@ -42,6 +42,7 @@ void touch_loop();
 void screen_setup();
 void screen_update();
 void switchScr(Screen* new_screen);
+void turnScreenOff();
 void animateSwitch(AnimationSelect as, Screen* os, Screen* ns);
 
 // Fonts

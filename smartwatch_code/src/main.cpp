@@ -12,7 +12,7 @@ void print_system_info();
 
 void setup() {
     Serial.begin(115200);
-    // pinMode(CASE_BUTTON, INPUT);
+    pinMode(CASE_BUTTON, INPUT);
     // sdc_setup();
     // sc_setup();
     bt_setup();

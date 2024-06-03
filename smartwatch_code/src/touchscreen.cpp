@@ -8,6 +8,7 @@
 
 
 #include "declarations.h"
+#include "sleep.h"
 
 TFT_eSPI tft = TFT_eSPI();
 CST816S touch(TOUCH_SDA, TOUCH_SCL, TOUCH_RST, TOUCH_IRQ); // sda, scl, rst, irq
@@ -20,6 +21,9 @@ TFT_eSprite nssprite = TFT_eSprite(&tft);
 TFT_eSprite essprite = TFT_eSprite(&tft);
 
 bool isAnimating = false;
+
+long timeOfLastInteraction = 0;
+bool hasJustWokenUp = false;
 
 void touch_setup() {
     touch.begin();
@@ -34,7 +38,13 @@ void touch_setup() {
 }
 
 void touch_loop() {
-        if (touch.available()) {
+    if (touch.available()) {
+        if (hasJustWokenUp) {
+            // ignore the interaction from waking up the device
+            hasJustWokenUp = false;
+            return;
+        }
+        timeOfLastInteraction = millis();
         Serial.print(touch.gesture());
         Serial.print("\t");
         Serial.print(touch.data.points);
@@ -45,6 +55,12 @@ void touch_loop() {
         Serial.print("\t");
         Serial.println(touch.data.y);
         activeScreen->handleInteraction(touch.gesture(), touch.data.x, touch.data.y);
+    }
+    if (millis() - timeOfLastInteraction > 10000) { // change this number for time before sleep
+        enableSleepMode();
+        // on return, sleep mode has been disabled
+        timeOfLastInteraction = millis();
+        hasJustWokenUp = true;
     }
 }
 
@@ -63,13 +79,17 @@ int startMillis = 0;
 void screen_update() {
     int mpf = millis() - startMillis;
     float fps = (float) ((float) 1000)/((float) mpf);
-    Serial.printf("FPS: %f\n", fps);
+    // Serial.printf("FPS: %f\n", fps);
     startMillis = millis();
     activeScreen->render();
 }
 
 void switchScr(Screen* new_screen) {
     activeScreen = new_screen;
+}
+
+void turnScreenOff() {
+    tft.fillScreen(TFT_BLACK);
 }
 
 void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
