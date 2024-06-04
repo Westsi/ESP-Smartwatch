@@ -1,0 +1,5 @@
+https://fonts.google.com/icons?icon.size=48&icon.color=%23FFFFFF&icon.platform=web&icon.query=message
+Icons are from google fonts
+Size = 48
+Color = #FFFFFF
+Grade = 0
