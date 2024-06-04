@@ -10,6 +10,7 @@
 
 void esFullScreenHandler(String gesture, int x, int y);
 
+uint16_t bluesteps48[48*48];
 
 void ExerciseScreen::init(TFT_eSprite* spr, int width, int height) {
     // setup
@@ -26,6 +27,8 @@ void ExerciseScreen::init(TFT_eSprite* spr, int width, int height) {
 
     // clock face
     spr->fillCircle(120, 120, 118, TFT_BLACK);
+    recolorImage(steps_48, 48, 48, TFT_WHITE, TFT_XON_BLUE, bluesteps48); // this takes O(n^2) where n is height of image
+
 }
 
 void ExerciseScreen::update() {
@@ -40,7 +43,7 @@ void ExerciseScreen::update() {
     }
     spr->drawSmoothArc(120, 120, 50, 40, 180, angle%360, TFT_XON_BLUE, TFT_DARKGREY, true);
     spr->setSwapBytes(true);
-    spr->pushImage(120-48/2, 120-48/2, 48, 48, steps_48);
+    spr->pushImage(120-48/2, 120-48/2, 48, 48, bluesteps48);
 }
 
 void ExerciseScreen::render() {

@@ -11,7 +11,7 @@ int16_t aX, aY, aZ, gX, gY, gZ;
 
 long timer = 0;
 
-uint32_t steps = 120;
+uint32_t steps = 60;
 
 void sc_setup() {
     Wire.begin(MPU_SDA, MPU_SCL);
@@ -24,14 +24,13 @@ void sc_loop() {
     //     sc_read();
     //     sc_write_serial();
     //     timer = millis();
-    //     steps = millis() / 1000;
     // }
-    // int clicked = digitalRead(13);
-    // if (clicked == LOW) {
-    //     steps++;
-    //     Serial.println("Button pressed");
-    //     delay(500);
-    // }
+    int clicked = digitalRead(CASE_BUTTON);
+    if (clicked == LOW) {
+        steps++;
+        Serial.println("Button pressed");
+        delay(500);
+    }
 }
 
 void sc_read() {

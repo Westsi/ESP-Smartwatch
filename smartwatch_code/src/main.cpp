@@ -33,11 +33,11 @@ void loop() {
 }
 
 void print_system_info() {
-  Serial.printf("CPU Information:\n\t");
-  Serial.printf("Revision %d\n\t",  ESP.getChipRevision());
-  Serial.printf("Model: %s\n\t", ESP.getChipModel());
-  Serial.printf("Cores: %d\n", ESP.getChipCores());
+    Serial.printf("CPU Information:\n\t");
+    Serial.printf("Revision %d\n\t",  ESP.getChipRevision());
+    Serial.printf("Model: %s\n\t", ESP.getChipModel());
+    Serial.printf("Cores: %d\n", ESP.getChipCores());
 
-  Serial.printf("Total PSRAM: %d\n", ESP.getPsramSize());
-  Serial.printf("Free PSRAM: %d\n", ESP.getFreePsram());
+    Serial.printf("Total PSRAM: %d\n", ESP.getPsramSize());
+    Serial.printf("Free PSRAM: %d\n", ESP.getFreePsram());
 }

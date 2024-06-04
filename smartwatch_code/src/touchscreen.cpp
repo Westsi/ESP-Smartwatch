@@ -56,7 +56,7 @@ void touch_loop() {
         Serial.println(touch.data.y);
         activeScreen->handleInteraction(touch.gesture(), touch.data.x, touch.data.y);
     }
-    if (millis() - timeOfLastInteraction > 10000) { // change this number for time before sleep
+    if (millis() - timeOfLastInteraction > 1000000) { // change this number for time before sleep
         enableSleepMode();
         // on return, sleep mode has been disabled
         timeOfLastInteraction = millis();
@@ -68,6 +68,7 @@ void touch_loop() {
 void screen_setup() {
     ledcSetup(0, 1000, 8); // setup pwm channel 0 with 1000 freq and 8 bit precision
     ledcAttachPin(SCREEN_BL, 0); // connect screen backlight pin to pwm 0
+    setScreenBrightness(255);
     tft.begin();
     tft.setRotation(0);
     tft.loadFont(FontLight14);
@@ -155,4 +156,16 @@ void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
     }
     
     activeScreen = new_screen;
+}
+
+
+void recolorImage(uint16_t* image, int w, int h, int repcol, int newcol, uint16_t* buf) {
+    for (int i=0;i<h*w;i++) {
+        if (image[i] == repcol) {
+            buf[i] = newcol;
+            continue;
+        }
+        buf[i] = image[i];
+        Serial.println(buf[i]);
+    }
 }
