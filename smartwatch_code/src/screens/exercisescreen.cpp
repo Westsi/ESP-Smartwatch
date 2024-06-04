@@ -6,7 +6,7 @@
 #include "ble.h"
 #include <TFT_eSPI.h>
 
-
+#include "icons/steps_48.h"
 
 void esFullScreenHandler(String gesture, int x, int y);
 
@@ -40,7 +40,7 @@ void ExerciseScreen::update() {
     }
     spr->drawSmoothArc(120, 120, 50, 40, 180, angle%360, TFT_XON_BLUE, TFT_DARKGREY, true);
     spr->setSwapBytes(true);
-    // spr->pushImage(40, 40, add_width, add_height, add_160);
+    spr->pushImage(120-48/2, 120-48/2, 48, 48, steps_48);
 }
 
 void ExerciseScreen::render() {
