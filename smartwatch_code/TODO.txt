@@ -4,3 +4,5 @@ App select screen
 Settings inc. backlight adjustment
 Config file
 Custom screen designer
+
+fix pcb with minimal blind/buried vias - crazy expensive with them
