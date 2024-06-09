@@ -6,20 +6,16 @@
 
 #define CASE_BUTTON 34
 
-#define SD_CS 27
-#define SD_MOSI 13
-#define SD_MISO 12
-#define SD_CLK 14
 
 #define SCREEN_MISO 35
-#define SCREEN_MOSI 23
+#define SCREEN_MOSI 21
 #define SCREEN_CLK 18
 #define SCREEN_CS 5
 #define SCREEN_DC 19
-#define SCREEN_RST 15
-#define SCREEN_BL 4
+#define SCREEN_RST 4
+#define SCREEN_BL 15
 
-#define TOUCH_SDA 21
+#define TOUCH_SDA 23
 #define TOUCH_SCL 22
 #define TOUCH_IRQ 26
 #define TOUCH_RST 25

@@ -1,7 +1,6 @@
 #include <Arduino.h>
 
 #include "stepcounter.h"
-#include "sdc.h"
 #include "touchscreen.h"
 #include "screens/watchface.h"
 #include "ble.h"
@@ -13,7 +12,6 @@ void print_system_info();
 void setup() {
     Serial.begin(115200);
     pinMode(CASE_BUTTON, INPUT);
-    // sdc_setup();
     // sc_setup();
     bt_setup();
     touch_setup();
