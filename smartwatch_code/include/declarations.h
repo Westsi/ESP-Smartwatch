@@ -17,8 +17,8 @@
 
 #define TOUCH_SDA 23
 #define TOUCH_SCL 22
-#define TOUCH_IRQ 26
-#define TOUCH_RST 25
+#define TOUCH_IRQ 25
+#define TOUCH_RST 26
 
 #define MANU_NAME "XONIZE_IND"
 #define MODEL_NUM "XSW1"
