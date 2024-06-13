@@ -6,6 +6,8 @@
 
 typedef void(*InteractionCallback)(String gesture, int x, int y);
 
+extern long timeOfLastInteraction;
+
 typedef struct IH {
     InteractionCallback callback;
     int minx;
@@ -44,6 +46,7 @@ void screen_update();
 void switchScr(Screen* new_screen);
 void turnScreenOff();
 void setScreenBrightness(int val);
+int getScreenBrightness();
 void animateSwitch(AnimationSelect as, Screen* os, Screen* ns);
 void recolorImage(uint16_t* image, int w, int h, int repcol, int newcol, uint16_t* buf);
 

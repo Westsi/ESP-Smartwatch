@@ -69,6 +69,7 @@ void ExerciseScreen::handleInteraction(String gesture, int x, int y) {
         if (x > ih.minx && x < ih.maxx && y > ih.miny && y < ih.maxy) {
             Serial.println("Found gesture handler");
             ih.callback(gesture, x, y);
+            break;
         }
     }
 }

@@ -59,7 +59,7 @@ void touch_loop() {
         Serial.println(touch.data.y);
         activeScreen->handleInteraction(touch.gesture(), touch.data.x, touch.data.y);
     }
-    if (millis() - timeOfLastInteraction > 1000000) { // change this number for time before sleep
+    if (millis() - timeOfLastInteraction > 10000000) { // change this number for time before sleep
         enableSleepMode();
         // on return, sleep mode has been disabled
         timeOfLastInteraction = millis();
@@ -104,6 +104,10 @@ void turnScreenOff() {
 // val is from 1-255, sent directly as PWM
 void setScreenBrightness(int val) {
     ledcWrite(0, val); // write brightness to channel 0
+}
+
+int getScreenBrightness() {
+    return ledcRead(0);
 }
 
 void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
