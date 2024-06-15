@@ -166,7 +166,6 @@ void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
     activeScreen = new_screen;
 }
 
-
 void recolorImage(uint16_t* image, int w, int h, int repcol, int newcol, uint16_t* buf) {
     for (int i=0;i<h*w;i++) {
         if (image[i] == repcol) {
@@ -174,6 +173,5 @@ void recolorImage(uint16_t* image, int w, int h, int repcol, int newcol, uint16_
             continue;
         }
         buf[i] = image[i];
-        Serial.println(buf[i]);
     }
 }

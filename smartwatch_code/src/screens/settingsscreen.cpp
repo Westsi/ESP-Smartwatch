@@ -11,8 +11,6 @@ void sliderHandler(String gesture, int x, int y);
 
 
 int knobVal = 50; // 1-255
-// knob bounding box for touch handling
-int knobminX, knobminY, knobmaxX, knobmaxY;
 
 void SettingsScreen::init(TFT_eSprite* spr, int width, int height) {
     // setup
@@ -31,14 +29,6 @@ void SettingsScreen::init(TFT_eSprite* spr, int width, int height) {
     knobVal = log((double)getScreenBrightness()) / 0.02173;
 }
 
-void calculateKnobBounding() {
-    // add touch border of 10px around knob
-    knobminX = 77 + (int)(86.0 * (float)((float)knobVal/255)) - 10;
-    knobmaxX = knobminX + 34 + 20; // 34 = width of knob, 20 = 2x10 offset - reset other side and add this side
-    knobminY = 90;
-    knobmaxY = 150;
-    // Serial.printf("(%d, %d) to (%d, %d)\n", knobminX, knobminY, knobmaxX, knobmaxY);
-}
 
 
 void SettingsScreen::update() {
@@ -49,7 +39,6 @@ void SettingsScreen::update() {
     // calculate relative pos of slider
     int relx = (int)(86.0 * (float)((float)knobVal/255));
     spr->fillSmoothCircle(77 + relx, 120, 17, TFT_XON_BLUE, TFT_DARKGREY);
-    calculateKnobBounding();
 }
 
 void SettingsScreen::render() {
