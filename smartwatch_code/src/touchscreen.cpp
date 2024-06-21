@@ -3,6 +3,7 @@
 #include "screens/notificationscreen.h"
 #include "screens/exercisescreen.h"
 #include "screens/settingsscreen.h"
+#include "config.h"
 
 #include <CST816S.h>
 #include <TFT_eSPI.h>
@@ -59,11 +60,11 @@ void touch_loop() {
         Serial.println(touch.data.y);
         activeScreen->handleInteraction(touch.gesture(), touch.data.x, touch.data.y);
     }
-    if (millis() - timeOfLastInteraction > 10000000) { // change this number for time before sleep
+    if (millis() - timeOfLastInteraction > 5000) { // change this number for time before sleep
         enableSleepMode();
         // on return, sleep mode has been disabled
         timeOfLastInteraction = millis();
-        setScreenBrightness(255); // set to max brightness - TODO: change when config added
+        setScreenBrightness(-1);
         hasJustWokenUp = true;
     }
 }
@@ -71,7 +72,7 @@ void touch_loop() {
 void screen_setup() {
     ledcSetup(0, 1000, 8); // setup pwm channel 0 with 1000 freq and 8 bit precision
     ledcAttachPin(SCREEN_BL, 0); // connect screen backlight pin to pwm 0
-    setScreenBrightness(255);
+    setScreenBrightness(-1);
     tft.begin();
     tft.setRotation(0);
     tft.loadFont(FontLight14);
@@ -98,15 +99,22 @@ void switchScr(Screen* new_screen) {
 
 void turnScreenOff() {
     tft.fillScreen(TFT_BLACK);
-    setScreenBrightness(0); // set to min brightness
+    ledcWrite(0, 0); // setting like this to avoid it getting saved
 }
 
-// val is from 1-255, sent directly as PWM
+// val is from 1-255, -1 = load brightness from config
 void setScreenBrightness(int val) {
-    ledcWrite(0, val); // write brightness to channel 0
+    if (val == -1) { // load user set brightness and set it
+        val = loadBrightness();
+    }
+    ledcWrite(0, val);
+    saveBrightness(val);
 }
 
 int getScreenBrightness() {
+    if (loadBrightness() != ledcRead(0)) {
+        Serial.println("BRIGHTNESS PROBLEM!!!");
+    }
     return ledcRead(0);
 }
 

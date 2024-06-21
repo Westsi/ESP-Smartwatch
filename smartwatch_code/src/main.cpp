@@ -6,11 +6,13 @@
 #include "ble.h"
 #include "declarations.h"
 #include "notifications.h"
+#include "config.h"
 
 void print_system_info();
 
 void setup() {
     Serial.begin(115200);
+    initConfig();
     pinMode(CASE_BUTTON, INPUT);
     // sc_setup();
     bt_setup();
