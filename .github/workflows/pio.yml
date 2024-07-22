@@ -20,6 +20,8 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
       - name: Install platformIO libraries
+        working-directory: ./smartwatch_code
         run: pio lib install
       - name: Build PlatformIO Project
+        working-directory: ./smartwatch_code
         run: pio run
