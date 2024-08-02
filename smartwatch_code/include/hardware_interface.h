@@ -3,5 +3,6 @@
 #include <Arduino.h>
 
 uint8_t getBatteryPercentage();
+float getBatteryVoltage();
 
 #endif

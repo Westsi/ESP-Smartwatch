@@ -6,6 +6,8 @@
 
 #define CASE_BUTTON 34
 
+#define BATTERY_MEASURE 36
+
 
 #define SCREEN_MISO 35
 #define SCREEN_MOSI 21

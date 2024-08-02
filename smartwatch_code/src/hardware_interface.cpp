@@ -1,14 +1,19 @@
 #include "hardware_interface.h"
+#include "declarations.h"
+
+#define BATT_MIN 3.3
+#define BATT_MAX 3.7
 
 uint8_t getBatteryPercentage() {
-    static int percentage = 100;
-    static long timer = 0;
-    if (millis() - timer > 10000) {
-        timer = millis();
-        percentage -= 5;
-        if (percentage < 0) {
-            percentage = 100;
-        }
-    }
-    return (uint8_t) percentage;
+    // TODO: implement percentages based off lipo discharge curves
+    return 78;
 }
+
+float getBatteryVoltage() {
+    float battv = (float)analogRead(BATTERY_MEASURE);
+    battv = battv / 4095; // adc "units" aka how many 4095ths of max voltage/2 we are seeing
+    battv = battv * BATT_MAX;
+    battv = battv * 2;
+
+    return battv;
+} 

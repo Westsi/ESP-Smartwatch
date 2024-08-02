@@ -14,6 +14,7 @@ void setup() {
     Serial.begin(115200);
     initConfig();
     pinMode(CASE_BUTTON, INPUT);
+    pinMode(BATTERY_MEASURE, INPUT);
     // sc_setup();
     bt_setup();
     touch_setup();

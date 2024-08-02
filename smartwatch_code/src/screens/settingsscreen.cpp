@@ -1,4 +1,5 @@
 #include "screens/settingsscreen.h"
+#include "hardware_interface.h"
 #include "touchscreen.h"
 #include "time.h"
 #include "declarations.h"
@@ -39,6 +40,11 @@ void SettingsScreen::update() {
     // calculate relative pos of slider
     int relx = (int)(86.0 * (float)((float)knobVal/255));
     spr->fillSmoothCircle(77 + relx, 120, 17, TFT_XON_BLUE, TFT_DARKGREY);
+
+    char batt[8];
+    float b = getBatteryVoltage();
+    snprintf(batt, sizeof(batt), "%.2fv", b);
+    spr->drawString(batt, 120, 200);
 }
 
 void SettingsScreen::render() {
