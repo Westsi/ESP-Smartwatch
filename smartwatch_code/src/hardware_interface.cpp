@@ -2,10 +2,11 @@
 #include "declarations.h"
 
 #define BATT_MIN 3.3
-#define BATT_MAX 3.7
+#define BATT_MAX 4.2
 
 uint8_t getBatteryPercentage() {
     // TODO: implement percentages based off lipo discharge curves
+    // https://electronics.stackexchange.com/questions/435837/calculate-battery-percentage-on-lipo-battery
     return 78;
 }
 
