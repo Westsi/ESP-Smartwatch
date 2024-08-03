@@ -9,6 +9,7 @@ uint8_t getBatteryPercentage() {
     // https://electronics.stackexchange.com/questions/435837/calculate-battery-percentage-on-lipo-battery
     // reasonably accurate formula
     float v = 123.0 - (123.0 / pow(1.0 + pow(getBatteryVoltage() / 3.7, 80), 0.165));
+    // TODO: jumps around like crazy - WHY?
     return (uint8_t) v;
 }
 
