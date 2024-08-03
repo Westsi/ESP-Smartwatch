@@ -42,8 +42,8 @@ void SettingsScreen::update() {
     spr->fillSmoothCircle(77 + relx, 120, 17, TFT_XON_BLUE, TFT_DARKGREY);
 
     char batt[8];
-    float b = getBatteryVoltage();
-    snprintf(batt, sizeof(batt), "%.2fv", b);
+    uint8_t b = getBatteryPercentage();
+    snprintf(batt, sizeof(batt), "%d%%", b);
     spr->drawString(batt, 120, 200);
 }
 

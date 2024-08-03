@@ -7,7 +7,9 @@
 uint8_t getBatteryPercentage() {
     // TODO: implement percentages based off lipo discharge curves
     // https://electronics.stackexchange.com/questions/435837/calculate-battery-percentage-on-lipo-battery
-    return 78;
+    // reasonably accurate formula
+    float v = 123.0 - (123.0 / pow(1.0 + pow(getBatteryVoltage() / 3.7, 80), 0.165));
+    return (uint8_t) v;
 }
 
 float getBatteryVoltage() {
