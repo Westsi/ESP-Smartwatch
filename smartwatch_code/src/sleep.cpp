@@ -12,8 +12,9 @@ void enableSleepMode() {
     gpio_wakeup_enable(GPIO_NUM_25, GPIO_INTR_LOW_LEVEL);
     esp_sleep_enable_gpio_wakeup();
     turnScreenOff();
-    
-    esp_light_sleep_start();
+    // turn screen off but turn back on if gpio 25 goes low
+    // after 5 mins with screen off start light sleep
+    // esp_light_sleep_start();
 
 
     // esp_sleep_enable_timer_wakeup(60*1000000); // 60 seconds in microseconds

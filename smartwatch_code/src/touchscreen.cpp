@@ -27,7 +27,7 @@ TFT_eSprite sssprite = TFT_eSprite(&tft);
 bool isAnimating = false;
 
 long timeOfLastInteraction = 0;
-bool hasJustWokenUp = false;
+bool isAsleep = false;
 
 void touch_setup() {
     touch.begin();
@@ -43,9 +43,11 @@ void touch_setup() {
 
 void touch_loop() {
     if (touch.available()) {
-        if (hasJustWokenUp) {
+        if (isAsleep) {
             // ignore the interaction from waking up the device
-            hasJustWokenUp = false;
+            isAsleep = false;
+            timeOfLastInteraction = millis();
+            setScreenBrightness(-1);
             return;
         }
         timeOfLastInteraction = millis();
@@ -62,10 +64,7 @@ void touch_loop() {
     }
     if (millis() - timeOfLastInteraction > 5000) { // change this number for time before sleep
         enableSleepMode();
-        // on return, sleep mode has been disabled
-        timeOfLastInteraction = millis();
-        setScreenBrightness(-1);
-        hasJustWokenUp = true;
+        isAsleep = true;
     }
 }
 

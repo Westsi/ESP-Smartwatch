@@ -11,7 +11,7 @@ int16_t aX, aY, aZ, gX, gY, gZ;
 
 long timer = 0;
 
-uint32_t steps = 60;
+uint32_t steps = 69;
 
 void sc_setup() {
     Wire.begin(MPU_SDA, MPU_SCL);
