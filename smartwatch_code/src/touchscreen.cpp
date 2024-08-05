@@ -53,7 +53,6 @@ void touch_loop() {
             setScreenBrightness(-1);
             return;
         }
-        timeOfLastInteraction = millis();
         Serial.print(touch.gesture());
         Serial.print("\t");
         Serial.print(touch.data.points);
@@ -63,9 +62,14 @@ void touch_loop() {
         Serial.print(touch.data.x);
         Serial.print("\t");
         Serial.println(touch.data.y);
+        if (millis() - timeOfLastInteraction < 200 || touch.gesture() == String("NONE")) {
+            Serial.println("returning");
+            return;
+        }
+        timeOfLastInteraction = millis();
         activeScreen->handleInteraction(touch.gesture(), touch.data.x, touch.data.y);
     }
-    if (millis() - timeOfLastInteraction > 5000) { // change this number for time before sleep
+    if (millis() - timeOfLastInteraction > 5000 && !isAsleep) { // change this number for time before sleep
         enableSleepMode();
         isAsleep = true;
     }
@@ -180,7 +184,7 @@ void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
     activeScreen = new_screen;
 }
 
-void recolorImage(uint16_t* image, int w, int h, int repcol, int newcol, uint16_t* buf) {
+void recolorImage(const uint16_t* image, int w, int h, int repcol, int newcol, uint16_t* buf) {
     for (int i=0;i<h*w;i++) {
         if (image[i] == repcol) {
             buf[i] = newcol;

@@ -18,17 +18,18 @@
 void hsFullScreenHandler(String gesture, int x, int y);
 
 typedef struct hsaicon {
-    prog_uint16_t* icon;
+    const prog_uint16_t* icon;
     Screen* scr;
+    const char* scrname;
 } app_icon_t;
 
-app_icon_t watchfaceicon = {.icon=schedule_160, .scr=&wf};
-// app_icon_t spotifyicon = {.icon=spotify_160, .scr=&sp};
-app_icon_t exerciseicon = {.icon=steps_160, .scr=&es};
-app_icon_t settingsicon = {.icon=settings_160, .scr=&ss};
-app_icon_t notificationsicon = {.icon=notifications_160, .scr=&ns};
+app_icon_t watchfaceicon = {.icon=schedule_160, .scr=&wf, .scrname="Watch"};
+app_icon_t spotifyicon = {.icon=spotify_160, .scr=&ss, .scrname="Spotify"};
+app_icon_t exerciseicon = {.icon=steps_160, .scr=&es, .scrname="Exercise"};
+app_icon_t settingsicon = {.icon=settings_160, .scr=&ss, .scrname="Settings"};
+app_icon_t notificationsicon = {.icon=notifications_160, .scr=&ns, .scrname="Notifications"};
 
-app_icon_t* appIcons[] = {&watchfaceicon, &notificationsicon, &exerciseicon, &settingsicon};
+app_icon_t* appIcons[] = {&watchfaceicon, &notificationsicon, &spotifyicon, &exerciseicon, &settingsicon};
 
 int activeicon = 0;
 
@@ -48,10 +49,17 @@ void Homescreen::init(TFT_eSprite* spr, int width, int height) {
 }
 
 void Homescreen::update() {
-    spr->drawString("Hello world!", 120, 120);
+    spr->fillScreen(TFT_BLACK);
     spr->setSwapBytes(true);
     app_icon_t* ic = appIcons[activeicon];
-    spr->pushImage(40, 40, 160, 160, ic->icon);
+    spr->pushImage(40, 20, 160, 160, ic->icon);
+    spr->drawString(appIcons[activeicon]->scrname, 120, 200);
+    if (activeicon != 0) {
+        spr->fillTriangle(120, 5, 110, 15, 130, 15, TFT_XON_BLUE);
+    }
+    if (activeicon != (sizeof(appIcons) / sizeof(appIcons[0])) - 1) {
+        spr->fillTriangle(120, 235, 110, 225, 130, 225, TFT_XON_BLUE);
+    }
 }
 
 void Homescreen::render() {
@@ -95,13 +103,13 @@ void hsFullScreenHandler(String gesture, int x, int y) {
         }
     }
     else if (gesture == "SWIPE LEFT") {
-
+        switchScr(appIcons[activeicon]->scr);
     }
     else if (gesture == "SWIPE RIGHT") {
 
     }
     else if (gesture == "SINGLE CLICK") {
-        // TODO: check which icon it is on and navigate to that screen
+        switchScr(appIcons[activeicon]->scr);
     }
     else if (gesture == "DOUBLE CLICK") {
 

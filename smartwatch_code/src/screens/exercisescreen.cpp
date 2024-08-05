@@ -1,6 +1,7 @@
 #include "screens/exercisescreen.h"
 #include "stepcounter.h"
 #include "touchscreen.h"
+#include "screens/homescreen.h"
 #include "declarations.h"
 #include "screens/watchface.h"
 #include "ble.h"
@@ -80,13 +81,13 @@ void esFullScreenHandler(String gesture, int x, int y) {
         
     }
     else if (gesture == "SWIPE UP") {
-        switchScr(&wf);
+
     }
     else if (gesture == "SWIPE LEFT") {
 
     }
     else if (gesture == "SWIPE RIGHT") {
-
+        switchScr(&hs);
     }
     else if (gesture == "SINGLE CLICK") {
         

@@ -48,7 +48,7 @@ void turnScreenOff();
 void setScreenBrightness(int val);
 int getScreenBrightness();
 void animateSwitch(AnimationSelect as, Screen* os, Screen* ns);
-void recolorImage(uint16_t* image, int w, int h, int repcol, int newcol, uint16_t* buf);
+void recolorImage(const uint16_t* image, int w, int h, int repcol, int newcol, uint16_t* buf);
 
 // Fonts
 
