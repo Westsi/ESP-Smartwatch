@@ -4,6 +4,7 @@
 #include "stepcounter.h"
 #include "hardware_interface.h"
 #include "notifications.h"
+#include "screens/spotifyscreen.h"
 
 #include <Arduino.h>
 #include <string>
@@ -248,6 +249,11 @@ void updateTime() {
 void handleReceivedData(std::string data) {
     // Serial.printf("RECEIVED DATA: \n\t");
     // Serial.println(data.c_str());
+    if (data == "END_SONG") {
+        spotdata = parseSpotify(responseStr);
+        responseStr.clear();
+        return;
+    }
     if (data == "END_NOTIF") {
         Notification* notif = parseNotification(responseStr);
         updateNotifications(notif);

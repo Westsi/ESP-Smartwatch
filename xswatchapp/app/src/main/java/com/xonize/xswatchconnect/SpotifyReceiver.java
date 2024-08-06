@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import java.util.Objects;
+
 import timber.log.Timber;
 
 public class SpotifyReceiver extends BroadcastReceiver {
@@ -17,6 +19,11 @@ public class SpotifyReceiver extends BroadcastReceiver {
     }
 
     private String songData = "";
+
+    private String artistName = "";
+    private String albumName = "";
+    private String trackName = "";
+    private int trackLengthInSec = 0;
     public boolean isPlaying = false;
 
     public String getStatusText() {
@@ -25,6 +32,16 @@ public class SpotifyReceiver extends BroadcastReceiver {
 
     public String getSongData() {
         return songData;
+    }
+
+    public String getWatchFormattedSongData() {
+        String s = "~TRACKNAME:" + trackName
+                    + "~ALBUMNAME:" + albumName
+                    + "~ARTISTNAME:" + artistName
+                    + "~LENGTH:" + trackLengthInSec
+                    + "~PLAYSTATUS:" + isPlaying;
+
+        return s;
     }
 
     public String isPlaying() {
@@ -50,10 +67,10 @@ public class SpotifyReceiver extends BroadcastReceiver {
         // feel free to include or leave out whatever suits you
         if (action.equals(BroadcastTypes.METADATA_CHANGED)) {
             String trackId = intent.getStringExtra("id");
-            String artistName = intent.getStringExtra("artist");
-            String albumName = intent.getStringExtra("album");
-            String trackName = intent.getStringExtra("track");
-            int trackLengthInSec = intent.getIntExtra("length", 0);
+            artistName = Objects.requireNonNull(intent.getStringExtra("artist")).replaceAll("[^\\p{ASCII}]", "");
+            albumName = Objects.requireNonNull(intent.getStringExtra("album")).replaceAll("[^\\p{ASCII}]", "");
+            trackName = Objects.requireNonNull(intent.getStringExtra("track")).replaceAll("[^\\p{ASCII}]", "");
+            trackLengthInSec = intent.getIntExtra("length", 0);
 
             songData = albumName + " - " + trackName + " - " + artistName;
             songData = songData.replaceAll("[^\\p{ASCII}]", ""); //remove all non-ascii characters, they don't play well with UTF-8 encoding

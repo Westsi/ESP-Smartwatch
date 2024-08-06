@@ -4,6 +4,7 @@
 #include "screens/exercisescreen.h"
 #include "screens/settingsscreen.h"
 #include "screens/homescreen.h"
+#include "screens/spotifyscreen.h"
 #include "config.h"
 
 #include <CST816S.h>
@@ -19,12 +20,14 @@ Watchface wf = Watchface();
 NotificationScreen ns = NotificationScreen();
 ExerciseScreen es = ExerciseScreen();
 SettingsScreen ss = SettingsScreen();
+SpotifyScreen sp = SpotifyScreen();
 Homescreen hs = Homescreen();
 Screen* activeScreen = &hs;
 TFT_eSprite wfsprite = TFT_eSprite(&tft);
 TFT_eSprite nssprite = TFT_eSprite(&tft);
 TFT_eSprite essprite = TFT_eSprite(&tft);
 TFT_eSprite sssprite = TFT_eSprite(&tft);
+TFT_eSprite spsprite = TFT_eSprite(&tft);
 TFT_eSprite hssprite = TFT_eSprite(&tft);
 
 bool isAnimating = false;
@@ -87,6 +90,7 @@ void screen_setup() {
     ns.init(&nssprite, 240, 240);
     es.init(&essprite, 240, 240);
     ss.init(&sssprite, 240, 240);
+    sp.init(&spsprite, 240, 240);
     hs.init(&hssprite, 240, 240);
 }
 

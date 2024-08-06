@@ -2,6 +2,7 @@
 #include "hardware_interface.h"
 #include "touchscreen.h"
 #include "screens/homescreen.h"
+#include "screens/watchface.h"
 #include "time.h"
 #include "declarations.h"
 #include "ble.h"
@@ -46,6 +47,8 @@ void SettingsScreen::update() {
     uint8_t b = getBatteryPercentage();
     snprintf(batt, sizeof(batt), "%d%%", b);
     spr->drawString(batt, 120, 200);
+
+    // TODO: make button to toggle digital/analog watch face
 }
 
 void SettingsScreen::render() {

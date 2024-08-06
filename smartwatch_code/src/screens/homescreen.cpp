@@ -3,6 +3,7 @@
 #include "screens/notificationscreen.h"
 #include "screens/exercisescreen.h"
 #include "screens/settingsscreen.h"
+#include "screens/spotifyscreen.h"
 #include "touchscreen.h"
 #include "time.h"
 #include "declarations.h"
@@ -24,7 +25,7 @@ typedef struct hsaicon {
 } app_icon_t;
 
 app_icon_t watchfaceicon = {.icon=schedule_160, .scr=&wf, .scrname="Watch"};
-app_icon_t spotifyicon = {.icon=spotify_160, .scr=&ss, .scrname="Spotify"};
+app_icon_t spotifyicon = {.icon=spotify_160, .scr=&sp, .scrname="Spotify"};
 app_icon_t exerciseicon = {.icon=steps_160, .scr=&es, .scrname="Exercise"};
 app_icon_t settingsicon = {.icon=settings_160, .scr=&ss, .scrname="Settings"};
 app_icon_t notificationsicon = {.icon=notifications_160, .scr=&ns, .scrname="Notifications"};

@@ -1,5 +1,5 @@
-#ifndef SCREENNAME_H_
-#define SCREENNAME_H_
+#ifndef HOMESCREEN_H_
+#define HOMESCREEN_H_
 
 #include "touchscreen.h"
 #include <TFT_eSPI.h>

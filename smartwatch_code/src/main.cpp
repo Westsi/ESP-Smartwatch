@@ -10,6 +10,8 @@
 
 void print_system_info();
 
+long phoneupdate = 0;
+
 void setup() {
     Serial.begin(115200);
     initConfig();
@@ -27,6 +29,12 @@ void setup() {
 }
 
 void loop() {
+    if (millis() - phoneupdate > 5000) {
+        Serial.println("Updating notifs");
+        sendCommand("UPDATE_NOTIFS");
+        sendCommand("SYNC_SPOTIFY");
+        phoneupdate = millis();
+    }
     sc_loop();
     bt_loop();
     touch_loop();
