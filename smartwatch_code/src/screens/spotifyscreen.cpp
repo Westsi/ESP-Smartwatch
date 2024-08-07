@@ -17,6 +17,8 @@ uint16_t greenplay48[48*48];
 uint16_t greenpause48[48*48];
 
 void spFullScreenHandler(String gesture, int x, int y);
+void playPauseHandler(String gesture, int x, int y);
+void skipsHandler(String gesture, int x, int y);
 
 
 void SpotifyScreen::init(TFT_eSprite* spr, int width, int height) {
@@ -30,6 +32,10 @@ void SpotifyScreen::init(TFT_eSprite* spr, int width, int height) {
     spr->setTextColor(TFT_WHITE, TFT_BLACK, true);
     spr->setTextDatum(MC_DATUM);
     spr->setTextWrap(true);
+    registerInteractionHandler(playPauseHandler, 90, 150, 80, 140);
+    registerInteractionHandler(skipsHandler, 35, 75, 95, 135);
+    registerInteractionHandler(skipsHandler, 170, 210, 95, 135);
+    // spr->pushImage(174, 110-12, 24, 24, skipnext_24);
     registerInteractionHandler(spFullScreenHandler, 0, 240, 0, 240);
     spotdata.trackname = "";
     spotdata.albumname = "";
@@ -139,6 +145,27 @@ void spFullScreenHandler(String gesture, int x, int y) {
     }
     else if (gesture == "LONG PRESS") {
 
+    }
+}
+
+void playPauseHandler(String gesture, int x, int y) {
+    if (gesture == "SINGLE CLICK") {
+        spotdata.isplaying = !spotdata.isplaying;
+        sendCommand("TOGGLE_SPOTIFY_PLAYING");
+    } else {
+        spFullScreenHandler(gesture, x, y);
+    }
+}
+
+void skipsHandler(String gesture, int x, int y) {
+    if (gesture == "SINGLE CLICK") {
+        if (x < 120) {
+            sendCommand("SKIP_PREV_SPOTIFY");
+        } else {
+            sendCommand("SKIP_NEXT_SPOTIFY");
+        }
+    } else {
+        spFullScreenHandler(gesture, x, y);
     }
 }
 

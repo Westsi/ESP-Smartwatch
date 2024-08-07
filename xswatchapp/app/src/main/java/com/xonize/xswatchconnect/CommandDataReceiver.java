@@ -31,13 +31,25 @@ public class CommandDataReceiver extends BroadcastReceiver {
             sendNotifications(context, peripheral);
         }
 
-        if (Objects.equals(data, "SYNC_SPOTIFY")) {
+        else if (Objects.equals(data, "SYNC_SPOTIFY")) {
             Timber.d("Syncing spotify");
             isSending = true;
             syncSpotify(context, peripheral);
         }
 
-        if (Objects.equals(data, "SYNC_TIME")) {
+        else if (Objects.equals(data, "TOGGLE_SPOTIFY_PLAYING")) {
+            MainActivity.sReceiver.toggleSpotifyPlay();
+        }
+
+        else if (Objects.equals(data, "SKIP_PREV_SPOTIFY")) {
+            MainActivity.sReceiver.prevSpotify();
+        }
+
+        else if (Objects.equals(data, "SKIP_NEXT_SPOTIFY")) {
+            MainActivity.sReceiver.nextSpotify();
+        }
+
+        else if (Objects.equals(data, "SYNC_TIME")) {
             Timber.d("Syncing time");
             isSending = true;
             syncTime(context, peripheral);
