@@ -33,6 +33,7 @@ void ExerciseScreen::init(TFT_eSprite* spr, int width, int height) {
 }
 
 void ExerciseScreen::update() {
+    spr->fillScreen(TFT_BLACK);
     long angle = map(getSteps(), 0, 100, 180, 540);
     // spr->drawSmoothArc(120, 120, 110, 100, 90, angle, TFT_XON_BLUE, TFT_BLACK, true);
     // x and y are centers, r is outer radius, ir is inner radius

@@ -1,6 +1,0 @@
-Icons for step and apps DONE
-Spotify screen
-App select screen
-Settings inc. backlight adjustment
-Config file
-Custom screen designer

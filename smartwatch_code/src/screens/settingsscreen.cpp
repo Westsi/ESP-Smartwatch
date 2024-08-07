@@ -11,6 +11,7 @@
 
 void ssFullScreenHandler(String gesture, int x, int y);
 void sliderHandler(String gesture, int x, int y);
+void toggleHandler(String gesture, int x, int y);
 
 
 int knobVal = 50; // 1-255
@@ -26,7 +27,8 @@ void SettingsScreen::init(TFT_eSprite* spr, int width, int height) {
     spr->setTextColor(TFT_WHITE, TFT_BLACK, true);
     spr->setTextDatum(MC_DATUM);
     spr->setTextWrap(true);
-    registerInteractionHandler(sliderHandler, 50, 207, 90, 150); // make sure this is put in first so it is called first
+    registerInteractionHandler(sliderHandler, 50, 207, 60, 120); // make sure this is put in first so it is called first
+    registerInteractionHandler(toggleHandler, 60, 180, 130, 190);
     registerInteractionHandler(ssFullScreenHandler, 0, 240, 0, 240);
 
     knobVal = log((double)getScreenBrightness()) / 0.02173;
@@ -37,18 +39,24 @@ void SettingsScreen::init(TFT_eSprite* spr, int width, int height) {
 void SettingsScreen::update() {
     spr->drawString("Settings", 120, 40);
     // draw slider
-    spr->fillSmoothRoundRect(60, 100, 120, 40, 20, TFT_DARKGREY, TFT_BLACK);
+    spr->fillSmoothRoundRect(60, 80, 120, 40, 20, TFT_DARKGREY, TFT_BLACK);
     // knob
     // calculate relative pos of slider
     int relx = (int)(86.0 * (float)((float)knobVal/255));
-    spr->fillSmoothCircle(77 + relx, 120, 17, TFT_XON_BLUE, TFT_DARKGREY);
+    spr->fillSmoothCircle(77 + relx, 100, 17, TFT_XON_BLUE, TFT_DARKGREY);
 
     char batt[8];
     uint8_t b = getBatteryPercentage();
     snprintf(batt, sizeof(batt), "%d%%", b);
     spr->drawString(batt, 120, 200);
 
-    // TODO: make button to toggle digital/analog watch face
+    
+    uint32_t buttonCol = (isDigitalFace) ? TFT_XON_BLUE : TFT_LIGHTGREY;
+    spr->fillSmoothRoundRect(60, 140, 120, 40, 10, buttonCol);
+    spr->setTextColor(TFT_WHITE, buttonCol, true);
+    spr->drawString("Digital Face?", 120, 160);
+    spr->setTextColor(TFT_WHITE, TFT_BLACK, true);
+    
 }
 
 void SettingsScreen::render() {
@@ -76,6 +84,14 @@ void SettingsScreen::handleInteraction(String gesture, int x, int y) {
             ih.callback(gesture, x, y);
             break;
         }
+    }
+}
+
+void toggleHandler(String gesture, int x, int y) {
+    if (gesture == "SINGLE CLICK") {
+        isDigitalFace = !isDigitalFace;
+    } else {
+        ssFullScreenHandler(gesture, x, y);
     }
 }
 

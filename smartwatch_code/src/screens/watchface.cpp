@@ -42,6 +42,7 @@ void Watchface::init(TFT_eSprite* spr, int width, int height) {
 }
 
 void Watchface::update() {
+    spr->fillScreen(TFT_BLACK);
     time_t now;
     struct tm timeinfo;
     time(&now);
