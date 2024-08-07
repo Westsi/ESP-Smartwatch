@@ -103,21 +103,9 @@ public class SpotifyReceiver extends BroadcastReceiver {
         }
     }
     public void nextSpotify() {
-        int keyCode = KeyEvent.KEYCODE_MEDIA_NEXT;
-
-        if (!isSpotifyRunning()) {
-            startMusicPlayer();
-        }
-
-        Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        Intent intent = new Intent("com.spotify.mobile.android.ui.widget.NEXT");
         intent.setPackage("com.spotify.music");
-        synchronized (this) {
-            intent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
-            MainActivity.reference.getApplicationContext().sendOrderedBroadcast(intent, null);
-
-            intent.putExtra(Intent.EXTRA_KEY_EVENT, new KeyEvent(KeyEvent.ACTION_UP, keyCode));
-            MainActivity.reference.getApplicationContext().sendOrderedBroadcast(intent, null);
-        }
+        MainActivity.reference.sendBroadcast(intent);
     }
 
     private void startMusicPlayer() {
