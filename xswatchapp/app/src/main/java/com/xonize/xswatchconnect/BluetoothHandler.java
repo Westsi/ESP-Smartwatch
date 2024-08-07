@@ -31,6 +31,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import timber.log.Timber;
@@ -71,8 +73,10 @@ class BluetoothHandler {
     public static final UUID COMMAND_SERVICE_UUID = UUID.fromString("0dd0c28b-d173-43bf-9dce-f2446591366d");
     public static final UUID COMMAND_CHAR_UUID = UUID.fromString("fed4ded3-97f1-44ca-b7a3-116cf78d9e77");
 
-    private static final UUID TIME_SERVICE_UUID = UUID.fromString("00001805-0000-1000-8000-00805F9B34FB");
-    private static final UUID TIME_CHAR_UUID = UUID.fromString("00002A2B-0000-1000-8000-00805F9B34FB");
+    public static final UUID TIME_SERVICE_UUID = UUID.fromString("00001805-0000-1000-8000-00805F9B34FB");
+    public static final UUID TIME_CHAR_UUID = UUID.fromString("00002A2B-0000-1000-8000-00805F9B34FB");
+//    private static final UUID TIME_DST_CHAR_UUID = UUID.fromString("00002A0D-0000-1000-8000-00805F9B34FB");
+    public static final UUID TIME_ZONE_CHAR_UUID = UUID.fromString("00002A0E-0000-1000-8000-00805F9B34FB");
 
     // Local variables
     public BluetoothCentralManager central;
@@ -98,10 +102,12 @@ class BluetoothHandler {
             } else {
                 seconds = System.currentTimeMillis() / 1000;
             }
-            int offset  = ZonedDateTime.now().getOffset().getTotalSeconds();
-            long overallSeconds = seconds + offset;
-            byte[] secs = String.valueOf(overallSeconds).getBytes();
+            String tz = ZoneIDToPosixString.ids.get(TimeZone.getDefault().toZoneId().toString());
+            Timber.d(tz);
+            byte[] secs = String.valueOf(seconds).getBytes();
+            byte[] tzs = tz.getBytes();
             peripheral.writeCharacteristic(TIME_SERVICE_UUID, TIME_CHAR_UUID, secs, WriteType.WITH_RESPONSE);
+            peripheral.writeCharacteristic(TIME_SERVICE_UUID, TIME_ZONE_CHAR_UUID, tzs, WriteType.WITH_RESPONSE);
             peripheral.writeCharacteristic(COMMAND_SERVICE_UUID, COMMAND_CHAR_UUID, "UPDATE_TIME".getBytes(StandardCharsets.UTF_8), WriteType.WITH_RESPONSE);
 
             // Read info from the Device Information Service

@@ -10,7 +10,8 @@
 
 void print_system_info();
 
-long phoneupdate = 0;
+long phoneupdate = -5000;
+long timeupdate = -15000;
 
 void setup() {
     Serial.begin(115200);
@@ -30,10 +31,14 @@ void setup() {
 
 void loop() {
     if (millis() - phoneupdate > 5000) {
-        Serial.println("Updating notifs");
         sendCommand("UPDATE_NOTIFS");
-        sendCommand("SYNC_SPOTIFY");
         phoneupdate = millis();
+    }
+
+    if (millis() - timeupdate > 18000) {
+        sendCommand("SYNC_TIME");
+        sendCommand("SYNC_SPOTIFY");
+        timeupdate = millis();
     }
     sc_loop();
     bt_loop();

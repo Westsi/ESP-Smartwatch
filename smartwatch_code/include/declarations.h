@@ -31,6 +31,7 @@
 
 #define TFT_XON_BLUE 0x3535 // #37a4ad
 #define TFT_XON_DARK_BLUE 0x3cf4 // #379da8
+#define TFT_SPOT_GREEN 0x25ca // #1db954
 // https://rgbcolorpicker.com/565
 
 

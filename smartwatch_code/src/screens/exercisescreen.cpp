@@ -28,7 +28,7 @@ void ExerciseScreen::init(TFT_eSprite* spr, int width, int height) {
 
     // clock face
     spr->fillCircle(120, 120, 118, TFT_BLACK);
-    recolorImage(steps_48, 48, 48, TFT_WHITE, TFT_XON_BLUE, bluesteps48); // this takes O(n^2) where n is height of image
+    recolorImage(steps_48, 48, 48, TFT_XON_BLUE, bluesteps48); // this takes O(n^2) where n is height of image
 
 }
 

@@ -3,11 +3,14 @@ package com.xonize.xswatchconnect;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.SystemClock;
 
 import com.welie.blessed.BluetoothPeripheral;
 import com.welie.blessed.WriteType;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import timber.log.Timber;
 
@@ -32,6 +35,12 @@ public class CommandDataReceiver extends BroadcastReceiver {
             Timber.d("Syncing spotify");
             isSending = true;
             syncSpotify(context, peripheral);
+        }
+
+        if (Objects.equals(data, "SYNC_TIME")) {
+            Timber.d("Syncing time");
+            isSending = true;
+            syncTime(context, peripheral);
         }
     }
 
@@ -78,5 +87,22 @@ public class CommandDataReceiver extends BroadcastReceiver {
                 WriteType.WITH_RESPONSE);
         isSending = false;
 
+    }
+
+    private void syncTime(Context ctx, BluetoothPeripheral peripheral) {
+        long seconds;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            seconds = SystemClock.currentNetworkTimeClock().millis() / 1000;
+        } else {
+            seconds = System.currentTimeMillis() / 1000;
+        }
+        String tz = ZoneIDToPosixString.ids.get(TimeZone.getDefault().toZoneId().toString());
+        Timber.d(tz);
+        byte[] secs = String.valueOf(seconds).getBytes();
+        byte[] tzs = tz.getBytes();
+        peripheral.writeCharacteristic(BluetoothHandler.TIME_SERVICE_UUID, BluetoothHandler.TIME_CHAR_UUID, secs, WriteType.WITH_RESPONSE);
+        peripheral.writeCharacteristic(BluetoothHandler.TIME_SERVICE_UUID, BluetoothHandler.TIME_ZONE_CHAR_UUID, tzs, WriteType.WITH_RESPONSE);
+        peripheral.writeCharacteristic(BluetoothHandler.COMMAND_SERVICE_UUID, BluetoothHandler.COMMAND_CHAR_UUID, "UPDATE_TIME".getBytes(StandardCharsets.UTF_8), WriteType.WITH_RESPONSE);
+        isSending = false;
     }
 }

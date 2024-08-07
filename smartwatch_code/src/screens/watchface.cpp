@@ -44,11 +44,7 @@ void Watchface::init(TFT_eSprite* spr, int width, int height) {
 void Watchface::update() {
     time_t now;
     struct tm timeinfo;
-
     time(&now);
-    setenv("TZ", "GMT", 1);
-    tzset();
-
     localtime_r(&now, &timeinfo);
     
     if (isDigitalFace) {

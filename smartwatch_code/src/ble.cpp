@@ -33,6 +33,7 @@
 
 #define TIME_SERVICE_UUID "00001805-0000-1000-8000-00805F9B34FB"
 #define TIME_CHAR_UUID "00002A2B-0000-1000-8000-00805F9B34FB"
+#define TIME_ZONE_CHAR_UUID "00002A0E-0000-1000-8000-00805F9B34FB"
 
 BLEServer* server = NULL;
 
@@ -49,6 +50,7 @@ BLECharacteristic* command = NULL;
 
 BLEService* timeService = NULL;
 BLECharacteristic* timeCharac = NULL;
+BLECharacteristic* timeZoneCharac = NULL;
 
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
@@ -179,6 +181,15 @@ void bt_setup() {
         BLECharacteristic::PROPERTY_INDICATE
     );
     timeCharac->addDescriptor(new BLE2902());
+
+    timeZoneCharac = timeService->createCharacteristic(
+        TIME_ZONE_CHAR_UUID,
+        BLECharacteristic::PROPERTY_READ   |
+        BLECharacteristic::PROPERTY_WRITE  |
+        BLECharacteristic::PROPERTY_NOTIFY |
+        BLECharacteristic::PROPERTY_INDICATE
+    );
+    timeZoneCharac->addDescriptor(new BLE2902());
     
 
     batteryService->start();
@@ -240,17 +251,19 @@ void updateTime() {
     timeval tval;
     tval.tv_sec = tt;
     tval.tv_usec = 0;
-    timezone tz;
-    tz.tz_dsttime = 0; // TODO: CHANGE WITH TIMEZONE
-    tz.tz_minuteswest = 0;
-    settimeofday(&tval, &tz);
+
+    std::string z = timeZoneCharac->getValue();
+
+    setenv("TZ", z.c_str(), 1);
+    tzset();
+    settimeofday(&tval, NULL);
 }
 
 void handleReceivedData(std::string data) {
     // Serial.printf("RECEIVED DATA: \n\t");
     // Serial.println(data.c_str());
     if (data == "END_SONG") {
-        spotdata = parseSpotify(responseStr);
+        parseSpotify(responseStr);
         responseStr.clear();
         return;
     }

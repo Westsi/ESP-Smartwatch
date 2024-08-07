@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ZoneIDToPosixString.setupmap();
         reference = this;
         getCodeCacheDir().setReadOnly();
         new File(getFilesDir().getPath() + "/data/com.xonize.xswatchconnect/code_cache/.overlay/base.apk/classes3.dex").setReadOnly();

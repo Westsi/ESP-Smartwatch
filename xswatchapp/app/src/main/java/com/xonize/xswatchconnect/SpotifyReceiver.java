@@ -24,6 +24,8 @@ public class SpotifyReceiver extends BroadcastReceiver {
     private String albumName = "";
     private String trackName = "";
     private int trackLengthInSec = 0;
+    private int playPos = 0;
+    private long playpostime;
     public boolean isPlaying = false;
 
     public String getStatusText() {
@@ -39,7 +41,12 @@ public class SpotifyReceiver extends BroadcastReceiver {
                     + "~ALBUMNAME:" + albumName
                     + "~ARTISTNAME:" + artistName
                     + "~LENGTH:" + trackLengthInSec
-                    + "~PLAYSTATUS:" + isPlaying;
+                    + "~PLAYSTATUS:" + isPlaying
+                    + "~PLAYPOS:" + (playPos+(System.currentTimeMillis()-playpostime))
+                    + "~UPDATETIME:" + System.currentTimeMillis();
+
+        Timber.d("Sending " + playPos/1000 + " seconds at " + System.currentTimeMillis()/1000 + " seconds past epoch.");
+
 
         return s;
     }
@@ -57,7 +64,10 @@ public class SpotifyReceiver extends BroadcastReceiver {
         // This is sent with all broadcasts, regardless of type. The value is taken from
         // System.currentTimeMillis(), which you can compare to in order to determine how
         // old the event is.
-        long timeSentInMs = intent.getLongExtra("timeSent", 0L);
+        long timeSentInMs = intent.getLongExtra("timeSent", System.currentTimeMillis());
+
+        playPos = intent.getIntExtra("playbackPosition", playPos);
+        playpostime = timeSentInMs;
 
         String action = intent.getAction();
         Timber.d("Got spotify data");

@@ -17,16 +17,18 @@ class SpotifyScreen : public Screen {
 extern SpotifyScreen sp;
 
 typedef struct SPOTINF {
-    const char* trackname;
-    const char* albumname;
-    const char* artistname;
+    std::string trackname;
+    std::string albumname;
+    std::string artistname;
     bool isplaying;
     int length;
+    int playpos;
+    unsigned long long updatetime;
 } spotify_info_t;
 
-extern spotify_info_t* spotdata;
+extern spotify_info_t spotdata;
 
-spotify_info_t* parseSpotify(std::string text);
+void parseSpotify(std::string text);
 
 
 #endif

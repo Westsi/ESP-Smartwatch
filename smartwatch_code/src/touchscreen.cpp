@@ -188,9 +188,9 @@ void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
     activeScreen = new_screen;
 }
 
-void recolorImage(const uint16_t* image, int w, int h, int repcol, int newcol, uint16_t* buf) {
+void recolorImage(const uint16_t* image, int w, int h, int newcol, uint16_t* buf) {
     for (int i=0;i<h*w;i++) {
-        if (image[i] == repcol) {
+        if (image[i] != 0) {
             buf[i] = newcol;
             continue;
         }
