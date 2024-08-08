@@ -8,6 +8,7 @@
 #include "ble.h"
 #include <TFT_eSPI.h>
 #include <math.h>
+#include "config.h"
 
 void ssFullScreenHandler(String gesture, int x, int y);
 void sliderHandler(String gesture, int x, int y);
@@ -90,6 +91,7 @@ void SettingsScreen::handleInteraction(String gesture, int x, int y) {
 void toggleHandler(String gesture, int x, int y) {
     if (gesture == "SINGLE CLICK") {
         isDigitalFace = !isDigitalFace;
+        saveWatchFace(isDigitalFace);
     } else {
         ssFullScreenHandler(gesture, x, y);
     }

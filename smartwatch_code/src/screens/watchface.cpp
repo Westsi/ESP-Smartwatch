@@ -7,6 +7,7 @@
 #include "declarations.h"
 #include "ble.h"
 #include <TFT_eSPI.h>
+#include "config.h"
 
 void wfFullScreenHandler(String gesture, int x, int y);
 
@@ -25,6 +26,7 @@ uint16_t hhWidth = 20, mhWidth = 6, shWidth = 3;
 // Global Variables for Digital Face
 
 void Watchface::init(TFT_eSprite* spr, int width, int height) {
+    isDigitalFace = loadWatchFace();
     // setup
     iHLen = 0;
     this->spr = spr;
