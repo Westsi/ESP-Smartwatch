@@ -18,6 +18,9 @@ To all non-profit or hobbyist users, this is under the GPL v2.0. I hereby prohib
 
 
 ## TODO
+- [ ] Implement OTA updates over BLE
+- [ ] Make weather sync as well
+- [ ] Put it all together
+- [ ] Calibrate battery level code
 - [ ] Make Exercise Tracker work properly with accelerometer
 - [ ] Saveable Preferences
-- [ ] More as required
