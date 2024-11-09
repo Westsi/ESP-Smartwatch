@@ -155,5 +155,17 @@ void recolorImage(const uint16_t* image, int w, int h, int newcol, uint16_t* buf
 #include "fonts/Rubik64.h"
 #define FontRubik64 Rubik64
 
+#include "fonts/NotoSansMath12.h"
+#define FontMath12 NotoSansMath12
+
+#include "fonts/NotoSansMath18.h"
+#define FontMath18 NotoSansMath18
+
+#include "fonts/NotoSansMath24.h"
+#define FontMath24 NotoSansMath24
+
+#include "fonts/NotoSansMath28.h"
+#define FontMath28 NotoSansMath28
+
 
 #endif

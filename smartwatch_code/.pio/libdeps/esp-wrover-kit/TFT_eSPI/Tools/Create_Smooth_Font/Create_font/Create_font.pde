@@ -121,20 +121,20 @@ import java.awt.Desktop; // Required to allow sketch to open file windows
 // When the sketch is run it will generate a file called "systemFontList.txt" in the sketch folder, press Ctrl+K to see it.
 // Open the "systemFontList.txt" in a text editor to view the font files and reference numbers for your system.
 
-int fontNumber = -1; // << Use [Number] in brackets from the fonts listed.
+int fontNumber = 479; // << Use [Number] in brackets from the fonts listed.
 
 // OR use font name for ttf files placed in the "Data" folder or the font number seen in IDE Console for system fonts
 //                                                  the font numbers are listed when the sketch is run.
 //                |         1         2     |       Maximum filename size for SPIFFS is 31 including leading /
 //                 1234567890123456789012345        and added point size and .vlw extension, so max is 25
-String fontName = "Final-Frontier";  // Manually crop the filename length later after creation if needed
+String fontName = "Noto-Sans-Math";  // Manually crop the filename length later after creation if needed
                                      // Note: SPIFFS does NOT accept underscore in a filename!
 String fontType = ".ttf";
 //String fontType = ".otf";
 
 
 // Define the font size in points for the TFT_eSPI font file
-int  fontSize = 28;
+int  fontSize = 24;
 
 // Font size to use in the Processing sketch display window that pops up (can be different to above)
 int displayFontSize = 28;

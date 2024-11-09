@@ -72,7 +72,7 @@ void touch_loop() {
         timeOfLastInteraction = millis();
         activeScreen->handleInteraction(touch.gesture(), touch.data.x, touch.data.y);
     }
-    if (millis() - timeOfLastInteraction > 5000 && !isAsleep) { // change this number for time before sleep
+    if (millis() - timeOfLastInteraction > 50000 && !isAsleep) { // change this number for time before sleep
         enableSleepMode();
         isAsleep = true;
     }
