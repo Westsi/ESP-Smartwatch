@@ -112,54 +112,54 @@ void Watchface::drawAnalogFace(struct tm timeinfo) {
         double anglerad = angledeg * PI / 180;
         delx = 100 * sin(anglerad);
         dely = -100 * cos(anglerad);
-        switch (i) {
-            case 1:
-                spr->drawString("cos(x)", 120+delx, 120+dely);
-                break;
-            case 2:
-                spr->drawString("e", 120+delx, 120+dely);
-                break;
-            case 3:
-                spr->drawString("π", 120+delx, 120+dely);
-                break;
-            case 4:
-                spr->drawString("3", 120+delx, 120+dely);
-                break;
-            case 5:
-                spr->drawString("π+e", 120+delx, 120+dely);
-                break;
-            case 6:
-                spr->drawString("τ", 120+delx, 120+dely);
-                break;
-            case 7:
-                spr->drawString("sin(7)", 120+delx, 120+dely);
-                break;
-            case 8:
-                spr->drawString("φ", 120+delx, 120+dely); // ,math symbols dont work even with math font!
-                spr->unloadFont();
-                spr->loadFont(FontMath12);
-                spr->drawString("3", 120+delx+4, 120+dely-10);
-                spr->unloadFont();
-                spr->loadFont(FontMath24);
-                break;
-            case 9:
-                spr->drawString("lim 8", 120+delx, 120+dely);
-                spr->unloadFont();
-                spr->loadFont(FontMath12);
-                spr->drawString("8->9", 120+delx-2, 120+dely+10);
-                spr->unloadFont();
-                spr->loadFont(FontMath24);
-                break;
-            case 10:
-                spr->drawString("g", 120+delx, 120+dely);
-                break;
-            case 11:
-                spr->drawString("tan(11)", 120+delx, 120+dely);
-                break;
-            case 12:
-                spr->drawString("18e/π", 120+delx, 120+dely);
-                break;
-        }
+        // switch (i) {
+        //     case 1:
+        //         spr->drawString("cos(x)", 120+delx, 120+dely);
+        //         break;
+        //     case 2:
+        //         spr->drawString("e", 120+delx, 120+dely);
+        //         break;
+        //     case 3:
+        //         spr->drawString("π", 120+delx, 120+dely);
+        //         break;
+        //     case 4:
+        //         spr->drawString("3", 120+delx, 120+dely);
+        //         break;
+        //     case 5:
+        //         spr->drawString("π+e", 120+delx, 120+dely);
+        //         break;
+        //     case 6:
+        //         spr->drawString("τ", 120+delx, 120+dely);
+        //         break;
+        //     case 7:
+        //         spr->drawString("sin(7)", 120+delx, 120+dely);
+        //         break;
+        //     case 8:
+        //         spr->drawString("φ", 120+delx, 120+dely); // ,math symbols dont work even with math font!
+        //         spr->unloadFont();
+        //         spr->loadFont(FontMath12);
+        //         spr->drawString("3", 120+delx+4, 120+dely-10);
+        //         spr->unloadFont();
+        //         spr->loadFont(FontMath24);
+        //         break;
+        //     case 9:
+        //         spr->drawString("lim 8", 120+delx, 120+dely);
+        //         spr->unloadFont();
+        //         spr->loadFont(FontMath12);
+        //         spr->drawString("8->9", 120+delx-2, 120+dely+10);
+        //         spr->unloadFont();
+        //         spr->loadFont(FontMath24);
+        //         break;
+        //     case 10:
+        //         spr->drawString("g", 120+delx, 120+dely);
+        //         break;
+        //     case 11:
+        //         spr->drawString("tan(11)", 120+delx, 120+dely);
+        //         break;
+        //     case 12:
+        //         spr->drawString("18e/π", 120+delx, 120+dely);
+        //         break;
+        // }
     }
     spr->unloadFont();
     spr->loadFont(FontLight24);

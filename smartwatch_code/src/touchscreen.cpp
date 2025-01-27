@@ -14,6 +14,10 @@
 #include "declarations.h"
 #include "sleep.h"
 
+/*
+TODO: multicore and partial updates
+*/
+
 TFT_eSPI tft = TFT_eSPI();
 CST816S touch(TOUCH_SDA, TOUCH_SCL, TOUCH_RST, TOUCH_IRQ); // sda, scl, rst, irq
 Watchface wf = Watchface();
@@ -99,7 +103,7 @@ int startMillis = 0;
 void screen_update() {
     int mpf = millis() - startMillis;
     float fps = (float) ((float) 1000)/((float) mpf);
-    // Serial.printf("FPS: %f\n", fps);
+    Serial.printf("FPS: %f\n", fps);
     startMillis = millis();
     activeScreen->render();
     // char fpss[8];
@@ -133,7 +137,7 @@ int getScreenBrightness() {
 }
 
 void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
-    int stages = 30; // does animation actually look better?
+    int stages = 15; // does animation actually look better?
     int step = 240/stages;
     new_screen->update();
     switch (as) {

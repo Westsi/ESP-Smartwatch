@@ -104,13 +104,15 @@ void hsFullScreenHandler(String gesture, int x, int y) {
         }
     }
     else if (gesture == "SWIPE LEFT") {
-        switchScr(appIcons[activeicon]->scr);
+        // switchScr(appIcons[activeicon]->scr);
+        animateSwitch(ANIMATE_IN_FROM_RIGHT, &hs, appIcons[activeicon]->scr);
     }
     else if (gesture == "SWIPE RIGHT") {
 
     }
     else if (gesture == "SINGLE CLICK") {
-        switchScr(appIcons[activeicon]->scr);
+        // switchScr(appIcons[activeicon]->scr);
+        animateSwitch(ANIMATE_IN_FROM_RIGHT, &hs, appIcons[activeicon]->scr);
     }
     else if (gesture == "DOUBLE CLICK") {
 
