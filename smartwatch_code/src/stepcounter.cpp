@@ -25,12 +25,14 @@ void sc_loop() {
     //     sc_write_serial();
     //     timer = millis();
     // }
-    int clicked = digitalRead(CASE_BUTTON);
-    if (clicked == LOW) {
-        steps++;
-        Serial.println("Button pressed");
-        delay(500);
-    }
+
+    // TODO: fix this
+    // int clicked = digitalRead(CASE_BUTTON);
+    // if (clicked == LOW) {
+    //     steps++;
+    //     Serial.println("Button pressed");
+    //     delay(500);
+    // }
 }
 
 void sc_read() {
