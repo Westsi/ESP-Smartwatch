@@ -103,7 +103,7 @@ int startMillis = 0;
 void screen_update() {
     int mpf = millis() - startMillis;
     float fps = (float) ((float) 1000)/((float) mpf);
-    Serial.printf("FPS: %f\n", fps);
+    // Serial.printf("FPS: %f\n", fps);
     startMillis = millis();
     activeScreen->render();
     // char fpss[8];

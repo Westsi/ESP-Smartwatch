@@ -77,6 +77,7 @@ void deleteNotification(int index) {
     delete n;
     if (idx == 1) {
         notifications[idx-1] = NULL;
+        idx--;
         return;
     }
     idx--;
