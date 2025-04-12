@@ -7,6 +7,7 @@
 #include "declarations.h"
 #include "notifications.h"
 #include "config.h"
+#include "updater.h"
 
 void print_system_info();
 
@@ -20,6 +21,7 @@ void setup() {
     pinMode(BATTERY_MEASURE, INPUT);
     // sc_setup();
     bt_setup();
+    initUpdaterFS();
     touch_setup();
     screen_setup();
     // zero notification array
@@ -29,21 +31,40 @@ void setup() {
     print_system_info();
 }
 
-void loop() {
-    if (millis() - phoneupdate > 5000) {
-        sendCommand("UPDATE_NOTIFS");
-        phoneupdate = millis();
-    }
+int pastMode = UPDATER__MODE;
 
-    if (millis() - timeupdate > 18000) {
-        sendCommand("SYNC_TIME");
-        sendCommand("SYNC_SPOTIFY");
-        timeupdate = millis();
+void loop() {
+    if (pastMode != UPDATER__MODE && UPDATER__MODE != UPDATER__NORMAL_MODE) {
+        screenUpdateInProgressMessage();
     }
-    sc_loop();
-    bt_loop();
-    touch_loop();
-    screen_update();
+    pastMode = UPDATER__MODE;
+    switch (UPDATER__MODE) {
+        case UPDATER__NORMAL_MODE:
+            {
+                if (millis() - phoneupdate > 5000) {
+                    sendCommand("UPDATE_NOTIFS");
+                    phoneupdate = millis();
+                }
+            
+                if (millis() - timeupdate > 18000) {
+                    sendCommand("SYNC_TIME");
+                    sendCommand("SYNC_SPOTIFY");
+                    timeupdate = millis();
+                }
+                sc_loop();
+                bt_loop();
+                touch_loop();
+                screen_update();
+            }
+        break;
+        case UPDATER__UPDATE_MODE:
+            updaterHandleUpdateMode();
+            break;
+        case UPDATER__OTA_MODE:
+            updaterHandleOTAMode();
+            break;
+    }
+    
 }
 
 void print_system_info() {

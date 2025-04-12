@@ -44,6 +44,7 @@ void touch_loop();
 void screen_setup();
 void screen_update();
 void switchScr(Screen* new_screen);
+void screenUpdateInProgressMessage();
 void turnScreenOff();
 void setScreenBrightness(int val);
 int getScreenBrightness();

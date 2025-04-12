@@ -5,6 +5,7 @@
 #include "hardware_interface.h"
 #include "notifications.h"
 #include "screens/spotifyscreen.h"
+#include "updater.h"
 
 #include <Arduino.h>
 #include <string>
@@ -85,7 +86,7 @@ class MyCommandCharacteristicCallbacks: public BLECharacteristicCallbacks {
         // Serial.println(cmd.c_str());
         if (cmd == "UPDATE_TIME") {
             updateTime();
-        } else {
+         } else {
             if (awaitingResponse) {
                 handleReceivedData(std::string(cmd.c_str()));
             }
@@ -199,6 +200,7 @@ void bt_setup() {
     timeService->start();
 
     BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+    initUpdaterBLE(server, pAdvertising);
     pAdvertising->addServiceUUID(BATTERY_SERVICE_UUID);
     pAdvertising->addServiceUUID(DEVICE_INFO_SERVICE_UUID);
     pAdvertising->addServiceUUID(STEP_SERVICE_UUID);

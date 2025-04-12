@@ -15,4 +15,6 @@ void handleReceivedData(std::string data);
 
 void sendCommand(std::string cmd);
 
+extern bool deviceConnected;
+
 #endif

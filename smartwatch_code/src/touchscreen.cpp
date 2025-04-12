@@ -115,6 +115,11 @@ void switchScr(Screen* new_screen) {
     activeScreen = new_screen;
 }
 
+void screenUpdateInProgressMessage() {
+    tft.fillScreen(TFT_BLACK);
+    tft.drawString("Update in progress", 120, 120);
+}
+
 void turnScreenOff() {
     tft.fillScreen(TFT_BLACK);
     ledcWrite(0, 0); // setting like this to avoid it getting saved
