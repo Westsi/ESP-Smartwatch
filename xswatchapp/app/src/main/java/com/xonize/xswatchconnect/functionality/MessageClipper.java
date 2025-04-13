@@ -1,4 +1,4 @@
-package com.xonize.xswatchconnect;
+package com.xonize.xswatchconnect.functionality;
 
 
 //basically just splits up a string and gives one part of it at a time

@@ -1,4 +1,4 @@
-package com.xonize.xswatchconnect;
+package com.xonize.xswatchconnect.functionality;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,12 +7,17 @@ import android.os.SystemClock;
 
 import com.welie.blessed.BluetoothPeripheral;
 import com.welie.blessed.WriteType;
+import com.xonize.xswatchconnect.MainActivity;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.TimeZone;
 
 import timber.log.Timber;
+
+import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
+import android.bluetooth.BluetoothGattService;
 
 public class CommandDataReceiver extends BroadcastReceiver {
 

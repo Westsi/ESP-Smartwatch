@@ -1,11 +1,9 @@
-package com.xonize.xswatchconnect;
+package com.xonize.xswatchconnect.functionality;
 
-import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.le.ScanResult;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -25,23 +23,16 @@ import com.welie.blessed.WriteType;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.UUID;
 
 import timber.log.Timber;
 
 import static com.welie.blessed.BluetoothBytesParser.FORMAT_UINT8;
-import static com.welie.blessed.BluetoothBytesParser.string2bytes;
 
 
-class BluetoothHandler {
+public class BluetoothHandler {
 
     public static int MTU = 0;
 
@@ -51,6 +42,9 @@ class BluetoothHandler {
 
     public static final String COMMAND_CHANNEL = "xonize.xswatchconnect.channel.command";
     public static final String COMMAND_CHANNEL_EXTRA = "xonize.xswatchconnect.channel.command.extra";
+
+    public static final String UPDATER_CHANNEL = "xonize.xswatchconnect.channel.updater";
+    public static final String UPDATER_CHANNEL_EXTRA = "xonize.xswatchconnect.channel.updater.extra";
     public static final String MEASUREMENT_EXTRA_PERIPHERAL = "xonize.xswatchconnect.measurement.peripheral";
 
     // UUIDs for the Device Information service (DIS)
@@ -78,13 +72,18 @@ class BluetoothHandler {
 //    private static final UUID TIME_DST_CHAR_UUID = UUID.fromString("00002A0D-0000-1000-8000-00805F9B34FB");
     public static final UUID TIME_ZONE_CHAR_UUID = UUID.fromString("00002A0E-0000-1000-8000-00805F9B34FB");
 
+    public static final UUID UPDATER_SERVICE_UUID = UUID.fromString("f0500802-0513-4aa5-82af-ec31bcd89eee");
+    public static final UUID UPDATER_RX_CHAR_UUID = UUID.fromString("ddbb2011-1ea6-47e3-b40b-9578c08ab5ef"); // This is called TX in the watch code, obviously TX from watch is RX here
+    public static final UUID UPDATER_TX_CHAR_UUID = UUID.fromString("6a0e8ce6-2e06-4434-aea8-71c3aea3465e");
+
     // Local variables
-    public BluetoothCentralManager central;
+    public static BluetoothCentralManager central;
     private static BluetoothHandler instance = null;
     private final Context context;
     private final Handler handler = new Handler();
 
     public static boolean connected = false;
+    public static BluetoothPeripheral connectedPeripheral;
 
     // Callback for peripherals
     private final BluetoothPeripheralCallback peripheralCallback = new BluetoothPeripheralCallback() {
@@ -123,6 +122,7 @@ class BluetoothHandler {
             peripheral.readCharacteristic(BATTERY_LEVEL_SERVICE_UUID, BATTERY_LEVEL_CHARACTERISTIC_UUID);
             peripheral.setNotify(STEPCOUNT_SERVICE_UUID, STEPCOUNT_CHARACTERISTIC_UUID, true);
             peripheral.setNotify(COMMAND_SERVICE_UUID, COMMAND_CHAR_UUID, true);
+            peripheral.setNotify(UPDATER_SERVICE_UUID, UPDATER_RX_CHAR_UUID, true);
         }
 
         @Override
@@ -188,6 +188,11 @@ class BluetoothHandler {
                 String command = parser.getStringValue();
                 intent.putExtra(COMMAND_CHANNEL_EXTRA, command);
                 sendMeasurement(intent, peripheral);
+            } else if (characteristicUUID.equals(UPDATER_RX_CHAR_UUID)) {
+                Intent intent = new Intent(UPDATER_CHANNEL);
+                byte[] bytes = parser.getValue();
+                intent.putExtra(UPDATER_CHANNEL_EXTRA, bytes);
+                sendMeasurement(intent, peripheral);
             }
         }
 
@@ -210,6 +215,7 @@ class BluetoothHandler {
         @Override
         public void onConnectedPeripheral(@NotNull BluetoothPeripheral peripheral) {
             Timber.i("connected to '%s'", peripheral.getName());
+            connectedPeripheral = peripheral;
             connected = true;
         }
 
@@ -222,6 +228,7 @@ class BluetoothHandler {
         public void onDisconnectedPeripheral(@NotNull final BluetoothPeripheral peripheral, final @NotNull HciStatus status) {
             Timber.i("disconnected '%s' with status %s", peripheral.getName(), status);
             connected = false;
+            connectedPeripheral = null;
 
             // Reconnect to this device when it becomes available again
             handler.postDelayed(new Runnable() {

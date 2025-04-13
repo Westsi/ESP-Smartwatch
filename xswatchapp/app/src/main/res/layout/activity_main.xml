@@ -43,5 +43,17 @@
             android:textAlignment="center"
             android:textSize="24sp" />
 
+        <Button
+            android:id="@+id/select_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select Update File" />
+
+        <Button
+            android:id="@+id/upload_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Upload Update File" />
+
     </LinearLayout>
 </ScrollView>

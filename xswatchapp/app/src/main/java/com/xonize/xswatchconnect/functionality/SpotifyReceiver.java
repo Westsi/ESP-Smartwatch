@@ -1,11 +1,12 @@
-package com.xonize.xswatchconnect;
+package com.xonize.xswatchconnect.functionality;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.KeyEvent;
+
+import com.xonize.xswatchconnect.MainActivity;
 
 import java.io.IOException;
 import java.util.Objects;

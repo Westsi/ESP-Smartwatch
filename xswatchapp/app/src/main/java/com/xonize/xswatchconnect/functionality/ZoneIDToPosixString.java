@@ -1,4 +1,4 @@
-package com.xonize.xswatchconnect;
+package com.xonize.xswatchconnect.functionality;
 
 import java.util.HashMap;
 

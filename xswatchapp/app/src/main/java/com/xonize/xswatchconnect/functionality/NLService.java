@@ -1,4 +1,4 @@
-package com.xonize.xswatchconnect;
+package com.xonize.xswatchconnect.functionality;
 
 /*
 * Credits:
@@ -7,7 +7,6 @@ package com.xonize.xswatchconnect;
 * */
 
 import android.app.Notification;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +16,8 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
+
+import com.xonize.xswatchconnect.MainActivity;
 
 import timber.log.Timber;
 
