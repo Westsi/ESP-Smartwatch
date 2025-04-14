@@ -12,12 +12,15 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -123,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Timber.d("Selecting File!!!!!");
                 if (checkExternal()) {
+                    Timber.d("external all good!");
                     Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
                     chooseFile = Intent.createChooser(chooseFile, "Choose a file");
                     startActivityForResult(chooseFile, FILE_PICK);
@@ -339,6 +343,44 @@ public class MainActivity extends AppCompatActivity {
         } else {
             permissionsGranted();
         }
+    }
+
+    private boolean checkExternal() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ActivityCompat.checkSelfPermission(
+                reference.getApplicationContext(),
+                Manifest.permission.READ_EXTERNAL_STORAGE
+        ) != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Timber.d("RequestCode=" + requestCode + ", ResultCode=" + resultCode + ", Data=" + (data != null));
+        if (resultCode == MainActivity.RESULT_OK) {
+            if (data != null && requestCode == FILE_PICK) {
+                Uri selectedFile = data.getData();
+                String[] filePathColumn = new String[]{MediaStore.Files.FileColumns.DATA};
+                if (selectedFile != null) {
+                    /*
+                    val filePath = RealPathUtil.getRealPath(this, selectedFile)
+                    if (filePath != null) {
+                        saveFile(File(filePath), null)
+                    }
+                     */
+                }
+            }
+        }
+    }
+
+    private void requestExternal() {
+        ActivityCompat.requestPermissions(
+                this,
+                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                20
+        );
     }
 
     private String[] getMissingPermissions(String[] requiredPermissions) {

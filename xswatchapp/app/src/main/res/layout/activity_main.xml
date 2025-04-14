@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="10dp"
     android:fillViewport="false">
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -15,7 +15,7 @@
 
         <TextView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginLeft="24dp"
             android:layout_marginTop="48dp"
             android:layout_marginRight="24dp"
@@ -26,34 +26,40 @@
         <TextView
             android:id="@+id/deviceconnectiondata"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="48dp"
             android:layout_gravity="center"
             android:text="Waiting for connection..."
             android:textAlignment="center"
             android:textSize="24sp" />
 
+        <Button
+            android:id="@+id/select_file"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Select Update File"
+            android:layout_marginTop="48dp"
+            android:layout_gravity="center"
+            android:visibility="visible" />
+
+        <Button
+            android:id="@+id/upload_update"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginTop="48dp"
+            android:layout_gravity="center"
+            android:text="Upload Update File"
+            android:visibility="visible"/>
+
         <TextView
             android:id="@+id/infodata"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="48dp"
             android:layout_gravity="center"
             android:text=""
             android:textAlignment="center"
             android:textSize="24sp" />
-
-        <Button
-            android:id="@+id/select_file"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Select Update File" />
-
-        <Button
-            android:id="@+id/upload_update"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Upload Update File" />
 
     </LinearLayout>
 </ScrollView>

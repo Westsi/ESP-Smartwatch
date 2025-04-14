@@ -3,6 +3,8 @@ package com.xonize.xswatchconnect;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.welie.blessed.BluetoothPeripheral;
@@ -52,6 +54,8 @@ public class UpdaterDataReceiver extends BroadcastReceiver {
         if (bytes[0] == (byte) 0xF2) {
             Timber.w("Transfer complete");
             Toast.makeText(context, "Transfer Complete", Toast.LENGTH_SHORT).show();
+            Button ub = MainActivity.reference.findViewById(R.id.upload_update);
+            ub.setVisibility(View.VISIBLE);
         }
         if (bytes[0] == (byte) 0x0F){
             byte[] textArray = new byte[bytes.length-1];

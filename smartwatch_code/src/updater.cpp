@@ -82,7 +82,7 @@ void updateFirmware(BLECharacteristic* pChar) {
                 updater[(pos * MTU) + x] = pData[x + 2];
             } else {
                 updater2[(pos * MTU) + x] = pData[x + 2];
-            }
+            } 
         }
     } else if  (pData[0] == 0xFC) {
         if (current) {

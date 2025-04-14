@@ -129,9 +129,9 @@ public class BluetoothHandler {
         public void onNotificationStateUpdate(@NotNull BluetoothPeripheral peripheral, @NotNull BluetoothGattCharacteristic characteristic, @NotNull GattStatus status) {
             if (status == GattStatus.SUCCESS) {
                 final boolean isNotifying = peripheral.isNotifying(characteristic);
-                Timber.i("SUCCESS: Notify set to '%s' for %s", isNotifying, characteristic.getUuid());
+                Timber.i("SUCCESS: Notify set to '%s' for %s", isNotifying, String.valueOf(characteristic.getUuid()));
             } else {
-                Timber.e("ERROR: Changing notification state failed for %s (%s)", characteristic.getUuid(), status);
+                Timber.e("ERROR: Changing notification state failed for %s (%s)", String.valueOf(characteristic.getUuid()), status);
             }
         }
 
@@ -140,9 +140,9 @@ public class BluetoothHandler {
             if (status == GattStatus.SUCCESS) {
                 // NOTE: if something breaks in writing, this is probably culprit! changed bytes2String(value) to new String(value, StandardCharsets.UTF_8)
                 // as it seems to have been removed from the library
-                Timber.i("SUCCESS: Writing <%s> to <%s>", new String(value, StandardCharsets.UTF_8), characteristic.getUuid());
+                Timber.i("SUCCESS: Writing <%s> to <%s>", new String(value, StandardCharsets.UTF_8), String.valueOf(characteristic.getUuid()));
             } else {
-                Timber.i("ERROR: Failed writing <%s> to <%s> (%s)", new String(value, StandardCharsets.UTF_8), characteristic.getUuid(), status);
+                Timber.i("ERROR: Failed writing <%s> to <%s> (%s)", new String(value, StandardCharsets.UTF_8), String.valueOf(characteristic.getUuid()), status);
             }
         }
 
@@ -214,19 +214,19 @@ public class BluetoothHandler {
 
         @Override
         public void onConnectedPeripheral(@NotNull BluetoothPeripheral peripheral) {
-            Timber.i("connected to '%s'", peripheral.getName());
+            Timber.i("connected to '%s'", String.valueOf(peripheral.getName()));
             connectedPeripheral = peripheral;
             connected = true;
         }
 
         @Override
         public void onConnectionFailed(@NotNull BluetoothPeripheral peripheral, final @NotNull HciStatus status) {
-            Timber.e("connection '%s' failed with status %s", peripheral.getName(), status);
+            Timber.e("connection '%s' failed with status %s", String.valueOf(peripheral.getName()), status);
         }
 
         @Override
         public void onDisconnectedPeripheral(@NotNull final BluetoothPeripheral peripheral, final @NotNull HciStatus status) {
-            Timber.i("disconnected '%s' with status %s", peripheral.getName(), status);
+            Timber.i("disconnected '%s' with status %s", String.valueOf(peripheral.getName()), status);
             connected = false;
             connectedPeripheral = null;
 
@@ -241,7 +241,7 @@ public class BluetoothHandler {
 
         @Override
         public void onDiscoveredPeripheral(@NotNull BluetoothPeripheral peripheral, @NotNull ScanResult scanResult) {
-            Timber.i("Found peripheral '%s'", peripheral.getName());
+            Timber.i("Found peripheral '%s'", String.valueOf(peripheral.getName()));
             central.stopScan();
 
             if (peripheral.getName().contains("Contour") && peripheral.getBondState() == BondState.NONE) {
