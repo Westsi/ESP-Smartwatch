@@ -30,7 +30,7 @@ uint8_t updater[16384];
 uint8_t updater2[16384];
 
 static bool sendMode = false, sendSize = true;
-static bool writeFile = false, request = false;
+static bool writeFile = false, request = !UPDATER__FASTMODE;
 static int writeLen = 0, writeLen2 = 0;
 static bool current = true;
 static int parts = 0, next = 0, cur = 0, MTU = 0;

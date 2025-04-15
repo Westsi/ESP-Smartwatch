@@ -1,10 +1,16 @@
 package com.xonize.xswatchconnect.utils;
 
+import android.net.Uri;
+
 import com.xonize.xswatchconnect.MainActivity;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import timber.log.Timber;
@@ -14,7 +20,7 @@ public class UpdaterUtils {
     public static int PART = 16384;
     public static String UPDATE_FILE = "update.bin";
 
-    public static int generateParts() {
+    public static int  generateParts() {
         byte[] bytes;
         try {
             bytes = Files.readAllBytes(new File(MainActivity.reference.getCacheDir(), "update.bin").toPath());
@@ -81,6 +87,73 @@ public class UpdaterUtils {
             }
         }
         return success & dir.delete();
+    }
+
+    public static void saveFile(File src, Uri uri) {
+        File dir = MainActivity.reference.getCacheDir();
+        Timber.d("Directory Path:%s", dir.getAbsolutePath());
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        File dst = new File(dir, UPDATE_FILE);
+        if (dst.exists()) {
+            dst.delete();
+        }
+        if (src != null) {
+            File info = new File(dir, "info.txt");
+            try (FileOutputStream fos = new FileOutputStream(info)) {
+                fos.write(src.getName().getBytes(StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try (FileInputStream in = new FileInputStream(src);
+                 FileOutputStream out = new FileOutputStream(dst)) {
+
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // Append mode FileOutputStream to flush
+            try (FileOutputStream fos = new FileOutputStream(dst, true)) {
+                fos.flush(); // Just flushes, doesn't write anything
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (uri != null) {
+            File info = new File(dir, "info.txt");
+            try (FileOutputStream fos = new FileOutputStream(info)) {
+                fos.write("firmware.bin".getBytes(StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try (InputStream in = MainActivity.reference.getContentResolver().openInputStream(uri);
+                 FileOutputStream out = new FileOutputStream(dst)) {
+
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            // Append-mode FileOutputStream, just to flush
+            try (FileOutputStream fos = new FileOutputStream(dst, true)) {
+                fos.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

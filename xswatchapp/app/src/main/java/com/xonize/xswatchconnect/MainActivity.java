@@ -34,6 +34,7 @@ import com.xonize.xswatchconnect.functionality.NLService;
 import com.xonize.xswatchconnect.functionality.SpotifyReceiver;
 import com.xonize.xswatchconnect.functionality.ZoneIDToPosixString;
 import com.xonize.xswatchconnect.utils.ByteConversions;
+import com.xonize.xswatchconnect.utils.RealPathUtil;
 import com.xonize.xswatchconnect.utils.UpdaterUtils;
 
 import org.jetbrains.annotations.NotNull;
@@ -42,6 +43,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -128,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 if (checkExternal()) {
                     Timber.d("external all good!");
                     Intent chooseFile = new Intent(Intent.ACTION_GET_CONTENT);
+                    chooseFile.setType("*/*");
                     chooseFile = Intent.createChooser(chooseFile, "Choose a file");
                     startActivityForResult(chooseFile, FILE_PICK);
                 } else {
@@ -346,7 +349,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean checkExternal() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ActivityCompat.checkSelfPermission(
+        String[] externalPerms = new String[]{Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_MEDIA_IMAGES};
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            for (String p : externalPerms) {
+                if (ActivityCompat.checkSelfPermission(reference.getApplicationContext(), p) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+            return true;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ActivityCompat.checkSelfPermission(
                 reference.getApplicationContext(),
                 Manifest.permission.READ_EXTERNAL_STORAGE
         ) != PackageManager.PERMISSION_GRANTED) {
@@ -358,29 +369,37 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Timber.d("RequestCode=" + requestCode + ", ResultCode=" + resultCode + ", Data=" + (data != null));
+        Timber.d("RequestCode=" + requestCode + ", ResultCode=" + resultCode + ", Data=" + (data != null) + String.valueOf(data));
         if (resultCode == MainActivity.RESULT_OK) {
             if (data != null && requestCode == FILE_PICK) {
                 Uri selectedFile = data.getData();
                 String[] filePathColumn = new String[]{MediaStore.Files.FileColumns.DATA};
                 if (selectedFile != null) {
-                    /*
-                    val filePath = RealPathUtil.getRealPath(this, selectedFile)
+                    String filePath = RealPathUtil.getRealPath(this, selectedFile);
                     if (filePath != null) {
-                        saveFile(File(filePath), null)
+                        Timber.d("onActivityResult saving file!");
+                        UpdaterUtils.saveFile(new File(filePath), null);
                     }
-                     */
                 }
             }
         }
     }
 
     private void requestExternal() {
-        ActivityCompat.requestPermissions(
-                this,
-                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                20
-        );
+        String[] externalPerms = new String[]{Manifest.permission.READ_MEDIA_AUDIO, Manifest.permission.READ_MEDIA_VIDEO, Manifest.permission.READ_MEDIA_IMAGES};
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    externalPerms,
+                    20
+            );
+        } else {
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    20
+            );
+        }
     }
 
     private String[] getMissingPermissions(String[] requiredPermissions) {
@@ -464,6 +483,7 @@ public class MainActivity extends AppCompatActivity {
         Timber.d("%d permissions given, %d request code", permissions.length, requestCode);
         for (String perm : permissions) {
             Timber.d("\tpermission given: %s", perm);
+            Timber.d("GRANT_RESULTS=%s", Arrays.toString(grantResults));
         }
         if (permissions.length == 0 || grantResults.length == 0) return;
 
