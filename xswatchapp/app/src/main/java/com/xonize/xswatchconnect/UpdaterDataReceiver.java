@@ -77,7 +77,7 @@ public class UpdaterDataReceiver extends BroadcastReceiver {
             e.printStackTrace();
             return;
         }
-        int s = BluetoothHandler.MTU-2;
+        int s = BluetoothHandler.MTU-6;
         int total = data.length / s;
 
         for (int i=0;i<total;i++) {
