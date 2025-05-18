@@ -3,4 +3,5 @@
   (lib (name "Espressif")(type "KiCad")(uri "${KIPRJMOD}/kicad-libraries-legacy_kicad7/footprints/Espressif.pretty")(options "")(descr ""))
   (lib (name "Connector_Wire_SMD")(type "KiCad")(uri "${KIPRJMOD}/Connector_Wire_SMD.pretty")(options "")(descr ""))
   (lib (name "Side_Button")(type "KiCad")(uri "${KIPRJMOD}/Side_Button.pretty")(options "")(descr ""))
+  (lib (name "SM13B-GHS-TB")(type "KiCad")(uri "${KIPRJMOD}/SM13B-GHS-TB")(options "")(descr ""))
 )
