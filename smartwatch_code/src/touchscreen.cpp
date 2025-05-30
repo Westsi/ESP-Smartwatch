@@ -5,6 +5,7 @@
 #include "screens/settingsscreen.h"
 #include "screens/homescreen.h"
 #include "screens/spotifyscreen.h"
+#include "screens/blackjackscreen.h"
 #include "config.h"
 
 #include <CST816S.h>
@@ -26,6 +27,7 @@ ExerciseScreen es = ExerciseScreen();
 SettingsScreen ss = SettingsScreen();
 SpotifyScreen sp = SpotifyScreen();
 Homescreen hs = Homescreen();
+BlackjackScreen bs = BlackjackScreen();
 Screen* activeScreen = &hs;
 TFT_eSprite wfsprite = TFT_eSprite(&tft);
 TFT_eSprite nssprite = TFT_eSprite(&tft);
@@ -33,6 +35,7 @@ TFT_eSprite essprite = TFT_eSprite(&tft);
 TFT_eSprite sssprite = TFT_eSprite(&tft);
 TFT_eSprite spsprite = TFT_eSprite(&tft);
 TFT_eSprite hssprite = TFT_eSprite(&tft);
+TFT_eSprite bssprite = TFT_eSprite(&tft);
 
 bool isAnimating = false;
 
@@ -96,6 +99,7 @@ void screen_setup() {
     ss.init(&sssprite, 240, 240);
     sp.init(&spsprite, 240, 240);
     hs.init(&hssprite, 240, 240);
+    bs.init(&bssprite, 240, 240);
 }
 
 int startMillis = 0;
@@ -169,7 +173,7 @@ void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
             Serial.printf("Rendered %d animation frames in %d milliseconds, FPS: %s\n", stages, timetaken, String(std::to_string(fps).c_str()));
             break;
         }
-        case ANIMATE_IN_FROM_LEFT:      
+        case ANIMATE_IN_FROM_LEFT:
         {
             long startMillis = millis();
             for (int i=stages;i>0;i--) {
@@ -185,7 +189,7 @@ void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
                 oss->setViewport(0, os_x, 0, os_width, 240);
                 oss->pushSprite(ns_width, 0, os_x, 0, os_width, 240);
                 nss->resetViewport();
-                nss->resetViewport();
+                oss->resetViewport();
             }
             long timetaken = millis() - startMillis;
             float fps = (float) ((float) stages)/((float)((float)timetaken/1000));

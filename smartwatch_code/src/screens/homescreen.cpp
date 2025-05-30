@@ -4,6 +4,7 @@
 #include "screens/exercisescreen.h"
 #include "screens/settingsscreen.h"
 #include "screens/spotifyscreen.h"
+#include "screens/blackjackscreen.h"
 #include "touchscreen.h"
 #include "time.h"
 #include "declarations.h"
@@ -15,6 +16,7 @@
 #include "icons/steps_160.h" // exercise tracker
 #include "icons/settings_160.h" // settings
 #include "icons/notifications_160.h" // notifications
+#include "icons/play_160.h" // blackjack
 
 void hsFullScreenHandler(String gesture, int x, int y);
 
@@ -29,8 +31,9 @@ app_icon_t spotifyicon = {.icon=spotify_160, .scr=&sp, .scrname="Spotify"};
 app_icon_t exerciseicon = {.icon=steps_160, .scr=&es, .scrname="Exercise"};
 app_icon_t settingsicon = {.icon=settings_160, .scr=&ss, .scrname="Settings"};
 app_icon_t notificationsicon = {.icon=notifications_160, .scr=&ns, .scrname="Notifications"};
+app_icon_t blackjackicon = {.icon=play_160, .scr=&bs, .scrname="Blackjack"};
 
-app_icon_t* appIcons[] = {&watchfaceicon, &notificationsicon, &spotifyicon, &exerciseicon, &settingsicon};
+app_icon_t* appIcons[] = {&watchfaceicon, &notificationsicon, &spotifyicon, &blackjackicon, &exerciseicon, &settingsicon};
 
 int activeicon = 0;
 
