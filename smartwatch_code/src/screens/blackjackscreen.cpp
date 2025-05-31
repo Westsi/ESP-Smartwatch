@@ -25,6 +25,9 @@ void handlePlayerDouble();
 int getMinHandValue(bool isDealerHand);
 int getMaxHandValue(bool isDealerHand);
 int getHandValue(bool isDealerHand);
+void handlePlayerLoss();
+void handlePlayerWin(bool isBlackjack);
+void handleDraw();
 
 
 void BlackjackScreen::init(TFT_eSprite* spr, int width, int height) {
@@ -47,6 +50,7 @@ void BlackjackScreen::update() {
         if (getHandValue(false) > 21) {
             gameRunning = false;
             gameOverMessage = "You went over 21!";
+            handlePlayerLoss();
         }
     }
     drawGameboard(spr);
@@ -142,6 +146,21 @@ void dealHand() {
     phIdx = 2;
     dhIdx = 2;
     gameRunning = true;
+    bool dealerBJ = (getMaxHandValue(true) == 21);
+    bool playerBJ = (getMaxHandValue(false) == 21);
+    if (dealerBJ && playerBJ) {
+        gameRunning = false;
+        gameOverMessage = "You both had blackjack!";
+        handleDraw();
+    } else if (playerBJ) {
+        gameRunning = false;
+        gameOverMessage = "You had blackjack!";
+        handlePlayerWin(true);
+    } else if (dealerBJ) {
+        gameRunning = false;
+        gameOverMessage = "Dealer had blackjack!";
+        handlePlayerLoss();
+    }
 }
 
 int getMinHandValue(bool isDealerHand) {
@@ -271,6 +290,10 @@ void drawGameboard(TFT_eSprite* spr) {
         phs = phs + playerHand[i];
     }
 
+    String pms = "Money: ";
+    pms = pms + money;
+
+    spr->drawString(pms, 120, 20);
     spr->drawString(dhs, 120, 40);
     spr->drawString(phs, 120, 60);
 
@@ -314,15 +337,19 @@ void handleDealerDraw() {
     int playerValue = getHandValue(false);
     if (playerValue > 21) {
         gameOverMessage = "You went over 21!";
+        handlePlayerLoss();
     }
     if (dealerValue > playerValue) {
         gameOverMessage = "You lost!";
+        handlePlayerLoss();
     }
     if (playerValue > dealerValue) {
         gameOverMessage = "You won!";
+        handlePlayerWin(false);
     }
     if (playerValue == dealerValue) {
-        gameOverMessage = "You drew";
+        gameOverMessage = "You drew!";
+        handleDraw();
     }
 }
 
@@ -344,4 +371,21 @@ void handlePlayerDouble() {
     playerHand[phIdx] = chooseRandomCard();
     phIdx++;
     handleDealerDraw();
+}
+
+void handlePlayerLoss() {
+    bet = 0;
+}
+
+void handlePlayerWin(bool isBlackjack) {
+    money += bet * 2;
+    if (isBlackjack) {
+        money += bet;
+    }
+    bet = 0;
+}
+
+void handleDraw() {
+    money += bet;
+    bet = 0;
 }
