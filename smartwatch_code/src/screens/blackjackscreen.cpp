@@ -28,6 +28,8 @@ int getHandValue(bool isDealerHand);
 void handlePlayerLoss();
 void handlePlayerWin(bool isBlackjack);
 void handleDraw();
+void drawGameboard(TFT_eSprite* spr);
+void dealHand();
 
 
 void BlackjackScreen::init(TFT_eSprite* spr, int width, int height) {
@@ -209,6 +211,7 @@ int getMinHandValue(bool isDealerHand) {
             break;
         }
     }
+    return minVal;
 }
 
 int getMaxHandValue(bool isDealerHand) {
@@ -257,6 +260,7 @@ int getMaxHandValue(bool isDealerHand) {
             break;
         }
     }
+    return maxVal;
 }
 
 int getHandValue(bool isDealerHand) {
