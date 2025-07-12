@@ -2,8 +2,6 @@
 # ESP32 Based Smartwatch
 A smartwatch with modern features such as notifications and Spotify sync, watch faces that can be customised, a 240x240 round LCD screen, and a companion app connected with a custom BLE profile.
 
-### A Quick Note on Licensing
-To all non-profit or hobbyist users, this is under the GPL v2.0. I hereby prohibit commercial use without express permission from me, Westsi, contactable at westsi@protonmail.com. Thank you!
 
 ## Features
 - Custom BLE Profile allowing for
@@ -13,14 +11,19 @@ To all non-profit or hobbyist users, this is under the GPL v2.0. I hereby prohib
   - Exercise Sync
 - Auto Sleep Timeout to save battery
 - Adjustable Brightness
-- Customizeable Watch Faces
+- Semi-customizeable Watch Faces
 - Rudimentary Exercise Tracker
+- Code for wireless (OTA) updates (most code from [fbiego/ESP32_BLE_OTA_Arduino](https://github.com/fbiego/ESP32_BLE_OTA_Arduino))
 
+## Prototype 1
+![alt text](PXL_20250407_110429820.MP.jpg "Prototype 1 Assembly")
+
+[Demo Video (youtube.com)](https://www.youtube.com/watch?v=f3tLT5q3JZY)
 
 ## TODO
-- [ ] Implement OTA updates over BLE
+- [ ] Fix OTA updates over BLE
 - [ ] Make weather sync as well
-- [ ] Put it all together
+- [x] Put it all together
 - [ ] Calibrate battery level code
 - [ ] Make Exercise Tracker work properly with accelerometer
 - [ ] Saveable Preferences
