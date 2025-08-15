@@ -1,4 +1,4 @@
-21827804294108204
+21831314853188403
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -61179,6 +61179,13 @@ Yellow 5381 Series LED
 0
 2
 2
+LIB_SM02B-GHS
+SM02BGHSTBLFSN
+SM02B-GHS-TB(LF)(SN)
+Connector
+0
+4
+4
 LSM6DSOXTR
 PQFN50P250X300X86-14N
 
@@ -83494,6 +83501,13 @@ Bourns rotary encoder, PEC12R, with switch, vertical shaft, https://www.bourns.c
 rotary encoder
 0
 7
+6
+SM04B-GHS
+JST_SM04B-GHS-TB_LF__SN_-
+
+
+0
+6
 6
 SM13B-GHS-TB
 JST_SM13B-GHS-TB
