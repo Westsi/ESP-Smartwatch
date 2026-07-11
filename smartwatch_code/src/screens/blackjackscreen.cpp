@@ -141,6 +141,8 @@ char chooseRandomCard() {
 
 void dealHand() {
     //TODO: get player bet - add a slider like brightness
+    bet = min(100, money);
+    money -= bet;
     playerHand[0] = chooseRandomCard();
     playerHand[1] = chooseRandomCard();
     dealerHand[0] = chooseRandomCard();
@@ -342,6 +344,10 @@ void handleDealerDraw() {
     if (playerValue > 21) {
         gameOverMessage = "You went over 21!";
         handlePlayerLoss();
+    }
+    if (dealerValue > 21) {
+        gameOverMessage = "You won!";
+        handlePlayerWin(false);
     }
     if (dealerValue > playerValue) {
         gameOverMessage = "You lost!";

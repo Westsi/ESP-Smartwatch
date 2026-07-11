@@ -21,7 +21,7 @@ void setup() {
     pinMode(BATTERY_MEASURE, INPUT);
     // sc_setup();
     bt_setup();
-    initUpdaterFS();
+    // initUpdaterFS();
     touch_setup();
     screen_setup();
     // zero notification array
