@@ -115,10 +115,10 @@ void bsFullScreenHandler(String gesture, int x, int y) {
                 if (y >= 100 && y <= 130) {
                     // Hit
                     handlePlayerHit();
-                } else if (y >= 140 && y <= 170) {
+                } else if (y >= 150 && y <= 180) {
                     // Stand
                     handlePlayerStand();
-                } else if (y >= 180 && y <= 210) {
+                } else if (y >= 200 && y <= 230) {
                     // Double
                     handlePlayerDouble();
                 }
@@ -328,7 +328,7 @@ void drawGameboard(TFT_eSprite* spr) {
 
         spr->fillSmoothRoundRect(60, 120, 120, 40, 10, TFT_XON_BLUE);
         spr->setTextColor(TFT_WHITE, TFT_XON_BLUE, true);
-        spr->drawString("New Game", 120, 120);
+        spr->drawString("New Game", 120, 140);
         spr->setTextColor(TFT_WHITE, TFT_BLACK, true);
     }
 }
@@ -345,19 +345,19 @@ void handleDealerDraw() {
         gameOverMessage = "You went over 21!";
         handlePlayerLoss();
     }
-    if (dealerValue > 21) {
+    else if (dealerValue > 21) {
         gameOverMessage = "You won!";
         handlePlayerWin(false);
     }
-    if (dealerValue > playerValue) {
+    else if (dealerValue > playerValue) {
         gameOverMessage = "You lost!";
         handlePlayerLoss();
     }
-    if (playerValue > dealerValue) {
+    else if (playerValue > dealerValue) {
         gameOverMessage = "You won!";
         handlePlayerWin(false);
     }
-    if (playerValue == dealerValue) {
+    else if (playerValue == dealerValue) {
         gameOverMessage = "You drew!";
         handleDraw();
     }
