@@ -10,8 +10,9 @@ class Notification {
         std::string app;
         std::string contents;
 };
-
+int DELETED_SIZE = 32;
 extern Notification* notifications[64];
+extern Notification* deletedNotifications[DELETED_SIZE];
 
 void updateNotifications(Notification* notif);
 Notification* parseNotification(std::string text);

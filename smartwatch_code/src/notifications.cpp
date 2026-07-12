@@ -3,7 +3,6 @@
 #include <Arduino.h>
 #include <string>
 
-int DELETED_SIZE = 32;
 Notification* notifications[64];
 Notification* deletedNotifications[DELETED_SIZE];
 int idx = 0;
