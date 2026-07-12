@@ -3,14 +3,22 @@
 #include <Arduino.h>
 #include <string>
 
+int DELETED_SIZE = 32;
 Notification* notifications[64];
+Notification* deletedNotifications[DELETED_SIZE];
 int idx = 0;
+int deletedIdx = 0;
 
 void updateNotifications(Notification* notif) {
     if (notif->app == "MISFORMATTED" || notif->contents == "MISFORMATTED" || notif->title == "MISFORMATTED") return;
     for (int i=0;i<idx;i++) {
         if (notifications[i]->app == notif->app && notifications[i]->contents == notif->contents && notifications[i]->title == notif->title) {
             return; // identical notification already exists
+        }
+    }
+    for (int i=0;i<deletedIdx;i++) {
+        if (deletedNotifications[i]->app == notif->app && deletedNotifications[i]->contents == notif->contents && deletedNotifications[i]->title == notif->title) {
+            return; // identical notification was deleted, don't add it back
         }
     }
     notifications[idx++] = notif;
@@ -74,7 +82,15 @@ Notification* getNotification(int index) {
 
 void deleteNotification(int index) {
     Notification* n = notifications[index];
-    delete n;
+    if (deletedIdx >= DELETED_SIZE) {
+        Notification* old = deletedNotifications[deletedIdx%DELETED_SIZE];
+        delete old;
+        deletedNotifications[deletedIdx%DELETED_SIZE] = n;
+        deletedIdx++;
+    } else {
+        deletedNotifications[deletedIdx++] = n;
+    }
+    // delete n;
     if (idx == 1) {
         notifications[idx-1] = NULL;
         idx--;
