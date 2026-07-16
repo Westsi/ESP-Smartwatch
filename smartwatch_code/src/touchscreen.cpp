@@ -6,6 +6,7 @@
 #include "screens/homescreen.h"
 #include "screens/spotifyscreen.h"
 #include "screens/blackjackscreen.h"
+#include "screens/stopwatch.h"
 #include "config.h"
 
 #include <CST816S.h>
@@ -28,6 +29,7 @@ SettingsScreen ss = SettingsScreen();
 SpotifyScreen sp = SpotifyScreen();
 Homescreen hs = Homescreen();
 BlackjackScreen bs = BlackjackScreen();
+Stopwatch sw = Stopwatch();
 Screen* activeScreen = &wf;
 TFT_eSprite wfsprite = TFT_eSprite(&tft);
 TFT_eSprite nssprite = TFT_eSprite(&tft);
@@ -36,6 +38,7 @@ TFT_eSprite sssprite = TFT_eSprite(&tft);
 TFT_eSprite spsprite = TFT_eSprite(&tft);
 TFT_eSprite hssprite = TFT_eSprite(&tft);
 TFT_eSprite bssprite = TFT_eSprite(&tft);
+TFT_eSprite swsprite = TFT_eSprite(&tft);
 
 bool isAnimating = false;
 
@@ -100,6 +103,7 @@ void screen_setup() {
     sp.init(&spsprite, 240, 240);
     hs.init(&hssprite, 240, 240);
     bs.init(&bssprite, 240, 240);
+    sw.init(&swsprite, 240, 240);
 }
 
 int startMillis = 0;

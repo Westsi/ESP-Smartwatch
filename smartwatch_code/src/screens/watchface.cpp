@@ -110,46 +110,48 @@ void Watchface::drawAnalogFace(struct tm timeinfo) {
         double delx, dely;
         double angledeg = 30.0*i;
         double anglerad = angledeg * PI / 180;
-        delx = 100 * sin(anglerad);
-        dely = -100 * cos(anglerad);
+        delx = 105 * sin(anglerad);
+        dely = -105 * cos(anglerad);
+        spr->drawSpot(120+delx, 120+dely, 2, TFT_WHITE);
         // TODO: draw lines instead of numbers for a cleaner look. they need to angle with the center of the clock face, so they need to be rotated by 30deg increments
-        switch (i) {
-            case 1:
-                spr->drawString("1", 120+delx, 120+dely);
-                break;
-            case 2:
-                spr->drawString("2", 120+delx, 120+dely);
-                break;
-            case 3:
-                spr->drawString("3", 120+delx, 120+dely);
-                break;
-            case 4:
-                spr->drawString("4", 120+delx, 120+dely);
-                break;
-            case 5:
-                spr->drawString("5", 120+delx, 120+dely);
-                break;
-            case 6:
-                spr->drawString("6", 120+delx, 120+dely);
-                break;
-            case 7:
-                spr->drawString("7", 120+delx, 120+dely);
-                break;
-            case 8:
-                spr->drawString("8", 120+delx, 120+dely);
-                break;
-            case 9:
-                spr->drawString("9", 120+delx, 120+dely);
-            case 10:
-                spr->drawString("10", 120+delx, 120+dely);
-                break;
-            case 11:
-                spr->drawString("11", 120+delx, 120+dely);
-                break;
-            case 12:
-                spr->drawString("12", 120+delx, 120+dely);
-                break;
-        }
+        // switch (i) {
+        //     case 1:
+        //         spr->drawString("1", 120+delx, 120+dely);
+        //         break;
+        //     case 2:
+        //         spr->drawString("2", 120+delx, 120+dely);
+        //         break;
+        //     case 3:
+        //         spr->drawString("3", 120+delx, 120+dely);
+        //         break;
+        //     case 4:
+        //         spr->drawString("4", 120+delx, 120+dely);
+        //         break;
+        //     case 5:
+        //         spr->drawString("5", 120+delx, 120+dely);
+        //         break;
+        //     case 6:
+        //         spr->drawString("6", 120+delx, 120+dely);
+        //         break;
+        //     case 7:
+        //         spr->drawString("7", 120+delx, 120+dely);
+        //         break;
+        //     case 8:
+        //         spr->drawString("8", 120+delx, 120+dely);
+        //         break;
+        //     case 9:
+        //         spr->drawString("9", 120+delx, 120+dely);
+        //         break;
+        //     case 10:
+        //         spr->drawString("10", 120+delx, 120+dely);
+        //         break;
+        //     case 11:
+        //         spr->drawString("11", 120+delx, 120+dely);
+        //         break;
+        //     case 12:
+        //         spr->drawString("12", 120+delx, 120+dely);
+        //         break;
+        // }
     }
     spr->unloadFont();
     spr->loadFont(FontLight24);
