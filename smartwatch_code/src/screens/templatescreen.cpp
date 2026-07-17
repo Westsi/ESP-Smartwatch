@@ -1,5 +1,6 @@
 #include "screens/templatescreen.h"
 #include "touchscreen.h"
+#include "screens/homescreen.h"
 #include "time.h"
 #include "declarations.h"
 #include "ble.h"
@@ -66,7 +67,7 @@ void snFullScreenHandler(String gesture, int x, int y) {
 
     }
     else if (gesture == "SWIPE RIGHT") {
-
+        switchScr(&hs);
     }
     else if (gesture == "SINGLE CLICK") {
         

@@ -5,13 +5,14 @@
 #include "screens/settingsscreen.h"
 #include "screens/spotifyscreen.h"
 #include "screens/blackjackscreen.h"
+#include "screens/stopwatch.h"
 #include "touchscreen.h"
 #include "time.h"
 #include "declarations.h"
 #include "ble.h"
 #include <TFT_eSPI.h>
 
-#include "icons/schedule_160.h" // watchface
+#include "icons/schedule_160.h" // watchface, stopwatch
 #include "icons/spotify_160.h" // spotify
 #include "icons/steps_160.h" // exercise tracker
 #include "icons/settings_160.h" // settings
@@ -32,8 +33,9 @@ app_icon_t exerciseicon = {.icon=steps_160, .scr=&es, .scrname="Exercise"};
 app_icon_t settingsicon = {.icon=settings_160, .scr=&ss, .scrname="Settings"};
 app_icon_t notificationsicon = {.icon=notifications_160, .scr=&ns, .scrname="Notifications"};
 app_icon_t blackjackicon = {.icon=play_160, .scr=&bs, .scrname="Blackjack"};
+app_icon_t stopwatchicon = {.icon=schedule_160, .scr=&sw, .scrname="Stopwatch"};
 
-app_icon_t* appIcons[] = {&watchfaceicon, &notificationsicon, &spotifyicon, &blackjackicon, &exerciseicon, &settingsicon};
+app_icon_t* appIcons[] = {&watchfaceicon, &stopwatchicon, &notificationsicon, &spotifyicon, &blackjackicon, &exerciseicon, &settingsicon};
 
 int activeicon = 0;
 

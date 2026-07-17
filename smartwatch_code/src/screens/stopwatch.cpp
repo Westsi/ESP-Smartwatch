@@ -1,4 +1,5 @@
 #include "screens/stopwatch.h"
+#include "screens/homescreen.h"
 #include "touchscreen.h"
 #include "time.h"
 #include "declarations.h"
@@ -7,8 +8,16 @@
 
 void swFullScreenHandler(String gesture, int x, int y);
 
+void drawButtons(TFT_eSprite* spr);
+void handleStartStop();
+void handleLapReset();
+
+unsigned long cumMillis = 0;
+unsigned long cumMicros = 0;
+
 unsigned long millisStart = 0;
 unsigned long microsStart = 0;
+bool isRunning = false;
 
 
 void Stopwatch::init(TFT_eSprite* spr, int width, int height) {
@@ -26,17 +35,27 @@ void Stopwatch::init(TFT_eSprite* spr, int width, int height) {
 }
 
 void Stopwatch::update() {
-    // use micros for stuff less than 60 seconds, millis for anything over that
+    spr->fillScreen(TFT_BLACK);
+    char tb[32];
     int elapsed = 0;
     int tmul = 1000; // 1000 ms in 1s
-    unsigned long mSElapsed = (millis() - millisStart);
-    if (mSElapsed > 70) {
-        elapsed = mSElapsed;
+    unsigned long mSElapsed = 0;
+    unsigned long uSElapsed = 0;
+    if (isRunning) {
+        // use micros for stuff less than 60 seconds, millis for anything over that
+        mSElapsed = (millis() - millisStart) + cumMillis;
+        uSElapsed = (micros() - microsStart) + cumMicros;
     } else {
-        elapsed = (micros() - microsStart);
-        tmul = 1000 * 1000; // 1000000 us in 1s
+        mSElapsed = cumMillis;
+        uSElapsed = cumMicros;
     }
 
+    if (mSElapsed > 60 * 1000) {
+        elapsed = mSElapsed;
+    } else {
+        elapsed = uSElapsed;
+        tmul = 1000 * 1000; // 1000000 us in 1s
+    }
     /*
     If hours, show h, m, s
     If minutes, show m, s, ms
@@ -68,23 +87,24 @@ void Stopwatch::update() {
     } else {
         showSMsUs = true;
     }
-    // TODO: make sure always to show leading 0 for m and s, and leading 00 for ms and us
-    char tb[32];
+    
     if (showHMS) {
-        sprintf(tb, "%d:%d:%d", h, m, s);
+        sprintf(tb, "%d:%02d:%02d", h, m, s);
     } else if (showMSMs) {
-        sprintf(tb, "%d:%d.%d", m, s, ms);
+        sprintf(tb, "%d:%02d.%03d", m, s, ms);
     } else if (showSMsUs) {
-        sprintf(tb, "%d.%d %du", s, ms, us);
+        sprintf(tb, "%d.%03d %03du", s, ms, us);
     }
     
     spr->unloadFont();
-    spr->loadFont(FontRubik64);
+    spr->loadFont(FontRubik28);
+    spr->setTextColor(TFT_XON_BLUE, TFT_BLACK, true);
     spr->drawString(tb, 120, 80);
     spr->unloadFont();
     spr->loadFont(FontLight20);
+    spr->setTextColor(TFT_WHITE, TFT_BLACK, true);
 
-    // TODO: add start/stop/reset button
+    drawButtons(spr);
     // TODO: down the line use side button for start/stop
 }
 
@@ -128,15 +148,70 @@ void swFullScreenHandler(String gesture, int x, int y) {
 
     }
     else if (gesture == "SWIPE RIGHT") {
-
+        switchScr(&hs);
     }
     else if (gesture == "SINGLE CLICK") {
-        
+        // stop/start x: 80-160, y: 130-160
+        // lap/reset x: 80-160, y: 170-200
+        if ((x >= 80) && (x <= 160)) {
+            if ((y >= 130) && (y <= 160)) {
+                handleStartStop();
+            } else if ((y >= 170) && (y <= 220)) {
+                handleLapReset();
+            }
+        }
     }
     else if (gesture == "DOUBLE CLICK") {
 
     }
     else if (gesture == "LONG PRESS") {
 
+    }
+}
+
+void drawButtons(TFT_eSprite* spr) {
+    spr->fillSmoothRoundRect(80, 130, 80, 30, 10, TFT_XON_BLUE);
+    spr->setTextColor(TFT_WHITE, TFT_XON_BLUE, true);
+    if (isRunning) {
+        spr->drawString("Stop", 120, 145);
+    } else {
+        spr->drawString("Start", 120, 145);
+    }
+    spr->setTextColor(TFT_WHITE, TFT_BLACK, true);
+
+    spr->fillSmoothRoundRect(80, 170, 80, 30, 10, TFT_XON_DARK_BLUE);
+    spr->setTextColor(TFT_WHITE, TFT_XON_DARK_BLUE, true);
+    if (isRunning) {
+        spr->drawString("Lap", 120, 185);
+    } else {
+        spr->drawString("Reset", 120, 185);
+    }
+    spr->setTextColor(TFT_WHITE, TFT_BLACK, true);
+}
+
+void handleStartStop() {
+    if (isRunning) {
+        // stop
+        cumMillis += (millis() - millisStart);
+        cumMicros += (micros() - microsStart);
+        millisStart = millis();
+        microsStart = micros();
+        isRunning = false;
+    } else {
+        // start
+        millisStart = millis();
+        microsStart = micros();
+        isRunning = true;
+    }
+}
+
+void handleLapReset() {
+    if (isRunning) {
+        // lap
+        // TODO: implement
+    } else {
+        // reset
+        cumMillis = 0;
+        cumMicros = 0;
     }
 }
