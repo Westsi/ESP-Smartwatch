@@ -11,6 +11,7 @@
 
 #include <CST816S.h>
 #include <TFT_eSPI.h>
+#include <math.h>
 
 
 #include "declarations.h"
@@ -39,6 +40,10 @@ TFT_eSprite spsprite = TFT_eSprite(&tft);
 TFT_eSprite hssprite = TFT_eSprite(&tft);
 TFT_eSprite bssprite = TFT_eSprite(&tft);
 TFT_eSprite swsprite = TFT_eSprite(&tft);
+
+float easeOutCubic(float t);
+int getRadius(int frame, int totalFrames);
+void drawCircularClip(TFT_eSprite* spr, int cx, int cy, int radius);
 
 bool isAnimating = false;
 
@@ -147,6 +152,78 @@ int getScreenBrightness() {
         Serial.println("BRIGHTNESS PROBLEM!!!");
     }
     return ledcRead(0);
+}
+
+float easeOutCubic(float t) {
+    // return 1.0f - powf(1.0f-t, 3);
+    if (t <= 0.5f) {
+        return 4 * t * t * t;
+    }
+    return 1 - powf(2-2*t, 3) / 2;
+}
+
+int getRadius(int frame, int totalFrames) {
+    // return (float)(((float)frame)/((float)totalFrames)) * 170.0f;
+
+    const int maxRadius = 170;
+    const int overshoot = 4;
+
+    // for 80% of the animation reveal the new screen
+    int revealFrames = totalFrames * 0.8f;
+
+    if (frame < revealFrames) {
+        float t = (float)frame / (revealFrames - 1);
+        return easeOutCubic(t) * maxRadius;
+    }
+
+    // last 20% is slight overshoot and return for settling
+    float t = (float)(frame - revealFrames) / (totalFrames - revealFrames - 1);
+
+    // go from 0 to 1 to 0
+    float bounce = 0;
+    if (t < 0.5f) {
+        bounce = t * 2.0f;
+    } else {
+        bounce = 1.0f - (t - 0.5f) * 2.0f;
+    }
+
+    return maxRadius + bounce * overshoot;
+}
+
+void drawCircularClip(TFT_eSprite* spr, int cx, int cy, int radius) {
+    int r2 = radius * radius;
+    for (int y = max(0, cy - radius); y <= min(239, cy + radius); y++) {
+        int dy = y - cy;
+        int dx = sqrtf(r2 - dy * dy);
+
+        int xStart = max(0, cx - dx);
+        int width = min(239, cx + dx) - xStart + 1;
+
+        if (width > 0) {
+            spr->pushSprite(xStart, y, xStart, y, width, 1);
+            // tft.fillRect(xStart, y, width, 1, TFT_RED);
+        }
+    }
+}
+
+void circleGrowAnimation(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
+    int stages = 15;
+    int cx = 120;
+    int cy = 120;
+    long startMillis = millis();
+    new_screen->update();
+    TFT_eSprite* oss = old_screen->spr;
+    TFT_eSprite* nss = new_screen->spr;
+    oss->pushSprite(0, 0);
+    for (int i=0;i<stages;i++) {
+        int radius = getRadius(i, stages);
+        Serial.printf("Stage is %d, radius is %d\n", i, radius);
+        drawCircularClip(nss, cx, cy, radius);
+    }
+    long timetaken = millis() - startMillis;
+    float fps = (float) ((float) stages)/((float)((float)timetaken/1000));
+    Serial.printf("Rendered %d animation frames in %d milliseconds, FPS: %s\n", stages, timetaken, String(std::to_string(fps).c_str()));
+    activeScreen = new_screen;
 }
 
 void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
