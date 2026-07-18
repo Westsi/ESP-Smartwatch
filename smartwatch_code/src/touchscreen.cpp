@@ -59,6 +59,11 @@ struct DirtyRect {
     }
 };
 
+struct PixelCoord {
+    uint8_t x;
+    uint8_t y;
+};
+
 float easeOutCubic(float t);
 float easeInOutCubic(float t);
 int getRadius(int frame, int totalFrames);
@@ -67,7 +72,9 @@ void drawCircularClip(TFT_eSprite* spr, int cx, int cy, int radius);
 void generateSweepMask();
 DirtyRect drawSweepFrame(uint8_t* frameBuf, uint8_t* newBuf, uint8_t prevProgress, uint8_t progress);
 
-uint8_t* sweepMask;
+PixelCoord* sweepPixels = nullptr;
+uint16_t angleOffsets[257];
+
 
 const uint8_t bayer4[4][4] = {
     {0, 8, 2, 10},
@@ -127,6 +134,7 @@ void screen_setup() {
     ledcAttachPin(SCREEN_BL, 0); // connect screen backlight pin to pwm 0
     setScreenBrightness(-1);
     tft.begin();
+    tft.initDMA();
     tft.setRotation(0);
     tft.loadFont(FontLight14);
     tft.fillScreen(TFT_GREEN);
@@ -264,24 +272,48 @@ void circleGrowAnimation(AnimationSelect as, Screen* old_screen, Screen* new_scr
 }
 
 void generateSweepMask() {
-    sweepMask = (uint8_t*)heap_caps_malloc(SCREEN_W * SCREEN_H, MALLOC_CAP_SPIRAM);
+    uint16_t counts[256] = {0};
     const int cx = SCREEN_W / 2;
     const int cy = SCREEN_H / 2;
 
+    // temp buf to avoid repeated atan2f
+    uint8_t* tempAngles = (uint8_t*) malloc(SCREEN_W * SCREEN_H);
+    if (!tempAngles) return;
+
+    // count how many pixels for each angle
     for (int y=0; y<SCREEN_H;y++) {
         for (int x=0;x<SCREEN_W;x++) {
             int dx = x - cx;
             int dy = cy-y; // invert so 0 degrees is at the top
-
             float angle = atan2f(dx, dy);
-
-            if (angle < 0) {
-                angle += 2 * PI;
-            }
-
-            sweepMask[y * SCREEN_W + x] = (uint8_t)(angle * 255.0f / (2 * PI));
+            if (angle < 0) angle += 2 * PI;
+            uint8_t a = (uint8_t)(angle * 255.0f / (2 * PI));
+            tempAngles[y * SCREEN_W + x] = a;
+            counts[a]++;
         }
     }
+
+    // generate cumulative offsets
+    angleOffsets[0] = 0;
+    for (int i=0;i<256;i++) {
+        angleOffsets[i+1] = angleOffsets[i] + counts[i];
+    }
+
+    // allocate coordinate array in psram
+    sweepPixels = (PixelCoord*) heap_caps_malloc(SCREEN_W * SCREEN_H * sizeof(PixelCoord), MALLOC_CAP_SPIRAM);
+    uint16_t currentOffsets[256];
+    memcpy(currentOffsets, angleOffsets, sizeof(currentOffsets));
+
+    // map pixels to angle buckets
+    for (int y=0; y<SCREEN_H;y++) {
+        for (int x=0;x<SCREEN_W;x++) {
+            uint8_t a = tempAngles[y * SCREEN_W + x];
+            uint16_t idx = currentOffsets[a]++;
+            sweepPixels[idx].x = x;
+            sweepPixels[idx].y = y;
+        }
+    }
+    free(tempAngles);
 }
 
 DirtyRect drawSweepFrame(uint8_t* frameBuf, uint8_t* newBuf, uint8_t prevProgress, uint8_t progress) {
@@ -289,44 +321,65 @@ DirtyRect drawSweepFrame(uint8_t* frameBuf, uint8_t* newBuf, uint8_t prevProgres
 
     DirtyRect dirty;
 
-    for (int y=0;y<SCREEN_H;y++) {
-        int runStart = -1;
-        for (int x=0;x<SCREEN_W;x++) {
-            uint8_t a = sweepMask[y * SCREEN_W + x];
-            bool draw = false;
+    int minX = SCREEN_W;
+    int minY = SCREEN_H;
+    int maxX = -1;
+    int maxY = -1;
 
-            if (a > prevProgress && a <= progress) {
-                draw = true;
-            } else if ((uint8_t)(a-progress) < band) {
-                // dither transition
-                uint8_t threshold = bayer4[y&3][x&3] * band / 16;
+    // solid zone (angles from prevProgress + 1 to progress)
+    uint8_t a = prevProgress + 1;
+    uint8_t solidEnd = progress + 1;
+    while (a != solidEnd) {
+        uint16_t startIdx = angleOffsets[a];
+        uint16_t endIdx = angleOffsets[a+1];
+        for(uint16_t i=startIdx;i<endIdx;i++) {
+            PixelCoord p = sweepPixels[i];
+            int idx = p.y * SCREEN_W + p.x;
+            frameBuf[idx] = newBuf[idx];
 
-                if ((uint8_t)(a-progress) < threshold) {
-                    draw = true;
-                }
-            }
+            if (p.x < minX) minX = p.x;
+            if (p.x > maxX) maxX = p.x;
+            if (p.y < minY) minY = p.y;
+            if (p.y > maxY) maxY = p.y;
+        }
+        a++;
+    }
 
-            if (draw && runStart < 0) {
-                runStart = x;
-            }
+    // dither zone (angles from progress + 1 to progress + band - 1)
+    uint8_t ditherEnd = progress + band;
+    while (a != ditherEnd) {
+        uint16_t startIdx = angleOffsets[a];
+        uint16_t endIdx = angleOffsets[a+1];
+        uint8_t deltaA = a- progress;
 
-            if ((!draw || x == SCREEN_W - 1) && runStart >= 0) {
-                int end = draw ? x : x - 1;
-                memcpy(
-                    frameBuf + y * SCREEN_W + runStart, 
-                    newBuf + y * SCREEN_W + runStart,
-                    end - runStart + 1
-                );
-                dirty.include(runStart, y, end - runStart + 1, 1);
-                runStart = -1;
+        for (uint16_t i=startIdx;i<endIdx;i++) {
+            PixelCoord p = sweepPixels[i];
+            uint8_t threshold = bayer4[p.y & 3][p.x & 3] * band / 16;
+            if (deltaA < threshold) {
+                int idx = p.y * SCREEN_W + p.x;
+                frameBuf[idx] = newBuf[idx];
+
+                if (p.x < minX) minX = p.x;
+                if (p.x > maxX) maxX = p.x;
+                if (p.y < minY) minY = p.y;
+                if (p.y > maxY) maxY = p.y;
             }
         }
+        a++;
     }
+
+    if (maxX >= minX && maxY >= minY) {
+        dirty.x1 = minX;
+        dirty.y1 = minY;
+        dirty.x2 = maxX;
+        dirty.y2 = maxY;
+    }
+
     return dirty;
 }
 
 void sweepAnimation(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
-    int stages = 18;
+    int stages = 28;
     new_screen->update();
     TFT_eSprite* oss = old_screen->spr;
     TFT_eSprite* nss = new_screen->spr;
@@ -357,7 +410,7 @@ void sweepAnimation(AnimationSelect as, Screen* old_screen, Screen* new_screen) 
         // frameSpr.pushSprite(0, 0);
         uint32_t t3 = micros();
         Serial.printf("frame %d, angle %d: render %lu us, push %lu us\n", i, angle, t2 - t1, t3 - t2);
-        delay(80);
+        // delay(80);
     }
     activeScreen = new_screen;
     long timetaken = millis() - startMillis;
