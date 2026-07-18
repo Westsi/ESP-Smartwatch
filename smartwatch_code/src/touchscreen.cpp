@@ -42,10 +42,21 @@ TFT_eSprite bssprite = TFT_eSprite(&tft);
 TFT_eSprite swsprite = TFT_eSprite(&tft);
 
 float easeOutCubic(float t);
+float easeInOutCubic(float t);
 int getRadius(int frame, int totalFrames);
 void drawCircularClip(TFT_eSprite* spr, int cx, int cy, int radius);
 
-bool isAnimating = false;
+void generateSweepMask();
+void drawSweepFrame(TFT_eSprite* spr, uint8_t progress);
+
+uint8_t* sweepMask;
+
+const uint8_t bayer4[4][4] = {
+    {0, 8, 2, 10},
+    {12, 4, 14, 6},
+    {3, 11, 1, 9},
+    {15, 7, 13, 5}
+};
 
 long timeOfLastInteraction = 0;
 bool isAsleep = false;
@@ -101,6 +112,7 @@ void screen_setup() {
     tft.setRotation(0);
     tft.loadFont(FontLight14);
     tft.fillScreen(TFT_GREEN);
+    generateSweepMask();
     wf.init(&wfsprite, 240, 240);
     ns.init(&nssprite, 240, 240);
     es.init(&essprite, 240, 240);
@@ -154,12 +166,18 @@ int getScreenBrightness() {
     return ledcRead(0);
 }
 
-float easeOutCubic(float t) {
+// TODO: cooler backgrounds than black, maybe a gradient like macos
+
+float easeInOutCubic(float t) {
     // return 1.0f - powf(1.0f-t, 3);
     if (t <= 0.5f) {
         return 4 * t * t * t;
     }
     return 1 - powf(2-2*t, 3) / 2;
+}
+
+float easeOutCubic(float t) {
+    return 1.0f - powf(1-t, 3);
 }
 
 int getRadius(int frame, int totalFrames) {
@@ -173,7 +191,7 @@ int getRadius(int frame, int totalFrames) {
 
     if (frame < revealFrames) {
         float t = (float)frame / (revealFrames - 1);
-        return easeOutCubic(t) * maxRadius;
+        return easeInOutCubic(t) * maxRadius;
     }
 
     // last 20% is slight overshoot and return for settling
@@ -219,11 +237,98 @@ void circleGrowAnimation(AnimationSelect as, Screen* old_screen, Screen* new_scr
         int radius = getRadius(i, stages);
         Serial.printf("Stage is %d, radius is %d\n", i, radius);
         drawCircularClip(nss, cx, cy, radius);
+        delay(30);
     }
     long timetaken = millis() - startMillis;
     float fps = (float) ((float) stages)/((float)((float)timetaken/1000));
     Serial.printf("Rendered %d animation frames in %d milliseconds, FPS: %s\n", stages, timetaken, String(std::to_string(fps).c_str()));
     activeScreen = new_screen;
+}
+
+void generateSweepMask() {
+    sweepMask = (uint8_t*)heap_caps_malloc(SCREEN_W * SCREEN_H, MALLOC_CAP_SPIRAM);
+    const int cx = SCREEN_W / 2;
+    const int cy = SCREEN_H / 2;
+
+    for (int y=0; y<SCREEN_H;y++) {
+        for (int x=0;x<SCREEN_W;x++) {
+            int dx = x - cx;
+            int dy = cy-y; // invert so 0 degrees is at the top
+
+            float angle = atan2f(dx, dy);
+
+            if (angle < 0) {
+                angle += 2 * PI;
+            }
+
+            sweepMask[y * SCREEN_W + x] = (uint8_t)(angle * 255.0f / (2 * PI));
+        }
+    }
+}
+
+void drawSweepFrame(TFT_eSprite* spr, uint8_t progress) {
+    uint8_t band = 15; // width of dither
+    uint8_t start = 0;
+    uint8_t end = progress;
+    Serial.println(progress);
+
+    for (int y=0;y<SCREEN_H;y++) {
+        int runStart = -1;
+        for (int x=0;x<SCREEN_W;x++) {
+            uint8_t a = sweepMask[y * SCREEN_W + x];
+            bool draw = false;
+
+            if (a <= end) {
+                draw = true;
+            } else if ((uint8_t)(a-end) < band) {
+                // dither transition
+                uint8_t threshold = bayer4[y&3][x&3] * band / 16;
+
+                if ((uint8_t)(a-end) < threshold) {
+                    draw = true;
+                }
+            }
+
+            if (draw && runStart < 0) {
+                runStart = x;
+            }
+
+            if (!draw && runStart >= 0) {
+                spr->pushSprite(runStart, y, runStart, y, x-runStart, 1);
+                runStart = -1;
+            }
+        }
+        if (runStart >= 0) {
+            spr->pushSprite(runStart, y, runStart, y, SCREEN_W - runStart, 1);
+        }
+    }
+}
+
+void sweepAnimation(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
+    int stages = 18;
+    long startMillis = millis();
+    new_screen->update();
+    TFT_eSprite* oss = old_screen->spr;
+    TFT_eSprite* nss = new_screen->spr;
+    oss->pushSprite(0, 0);
+    TFT_eSprite frameSpr = TFT_eSprite(&tft);
+
+    uint8_t* frame = (uint8_t*)frameSpr.getPointer();
+    uint8_t* oldBuf = (uint8_t*)old_screen->spr->getPointer();
+    uint8_t* newBuf = (uint8_t*)new_screen->spr->getPointer();
+
+    for (int i=0;i<stages;i++) {
+        float t = (float) i / (stages-1);
+        float e = easeOutCubic(t);
+
+        uint8_t angle = e * 255;
+        drawSweepFrame(nss, angle);
+        // delay(12);
+    }
+    activeScreen = new_screen;
+    long timetaken = millis() - startMillis;
+    float fps = (float) ((float) stages)/((float)((float)timetaken/1000));
+    Serial.printf("Rendered %d animation frames in %d milliseconds, FPS: %s\n", stages, timetaken, String(std::to_string(fps).c_str()));
 }
 
 void animateSwitch(AnimationSelect as, Screen* old_screen, Screen* new_screen) {

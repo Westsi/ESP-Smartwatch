@@ -49,6 +49,7 @@ void turnScreenOff();
 void setScreenBrightness(int val);
 int getScreenBrightness();
 void circleGrowAnimation(AnimationSelect as, Screen* old_screen, Screen* new_screen);
+void sweepAnimation(AnimationSelect as, Screen* old_screen, Screen* new_screen);
 void animateSwitch(AnimationSelect as, Screen* os, Screen* ns);
 void recolorImage(const uint16_t* image, int w, int h, int newcol, uint16_t* buf);
 

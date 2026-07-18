@@ -1,6 +1,9 @@
 #ifndef DECLARATIONS_H_
 #define DECLARATIONS_H_
 
+#define SCREEN_W 240
+#define SCREEN_H 240
+
 #define MPU_SDA 32
 #define MPU_SCL 33
 
