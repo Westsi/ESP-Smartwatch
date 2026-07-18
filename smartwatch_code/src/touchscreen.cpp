@@ -41,13 +41,31 @@ TFT_eSprite hssprite = TFT_eSprite(&tft);
 TFT_eSprite bssprite = TFT_eSprite(&tft);
 TFT_eSprite swsprite = TFT_eSprite(&tft);
 
+struct DirtyRect {
+    int x1 = SCREEN_W;
+    int y1 = SCREEN_H;
+    int x2 = -1;
+    int y2 = -1;
+
+    void include(int x, int y, int width, int height) {
+        x1 = min(x1, x);
+        y1 = min(y1, y);
+        x2 = max(x2, x + width - 1);
+        y2 = max(y2, y + height - 1);
+    }
+
+    bool valid() {
+        return x2 >= x1 && y2 >= y1;
+    }
+};
+
 float easeOutCubic(float t);
 float easeInOutCubic(float t);
 int getRadius(int frame, int totalFrames);
 void drawCircularClip(TFT_eSprite* spr, int cx, int cy, int radius);
 
 void generateSweepMask();
-void drawSweepFrame(TFT_eSprite* spr, uint8_t progress);
+DirtyRect drawSweepFrame(uint8_t* frameBuf, uint8_t* newBuf, uint8_t prevProgress, uint8_t progress);
 
 uint8_t* sweepMask;
 
@@ -266,11 +284,10 @@ void generateSweepMask() {
     }
 }
 
-void drawSweepFrame(TFT_eSprite* spr, uint8_t progress) {
+DirtyRect drawSweepFrame(uint8_t* frameBuf, uint8_t* newBuf, uint8_t prevProgress, uint8_t progress) {
     uint8_t band = 15; // width of dither
-    uint8_t start = 0;
-    uint8_t end = progress;
-    Serial.println(progress);
+
+    DirtyRect dirty;
 
     for (int y=0;y<SCREEN_H;y++) {
         int runStart = -1;
@@ -278,13 +295,13 @@ void drawSweepFrame(TFT_eSprite* spr, uint8_t progress) {
             uint8_t a = sweepMask[y * SCREEN_W + x];
             bool draw = false;
 
-            if (a <= end) {
+            if (a > prevProgress && a <= progress) {
                 draw = true;
-            } else if ((uint8_t)(a-end) < band) {
+            } else if ((uint8_t)(a-progress) < band) {
                 // dither transition
                 uint8_t threshold = bayer4[y&3][x&3] * band / 16;
 
-                if ((uint8_t)(a-end) < threshold) {
+                if ((uint8_t)(a-progress) < threshold) {
                     draw = true;
                 }
             }
@@ -293,37 +310,54 @@ void drawSweepFrame(TFT_eSprite* spr, uint8_t progress) {
                 runStart = x;
             }
 
-            if (!draw && runStart >= 0) {
-                spr->pushSprite(runStart, y, runStart, y, x-runStart, 1);
+            if ((!draw || x == SCREEN_W - 1) && runStart >= 0) {
+                int end = draw ? x : x - 1;
+                memcpy(
+                    frameBuf + y * SCREEN_W + runStart, 
+                    newBuf + y * SCREEN_W + runStart,
+                    end - runStart + 1
+                );
+                dirty.include(runStart, y, end - runStart + 1, 1);
                 runStart = -1;
             }
         }
-        if (runStart >= 0) {
-            spr->pushSprite(runStart, y, runStart, y, SCREEN_W - runStart, 1);
-        }
     }
+    return dirty;
 }
 
 void sweepAnimation(AnimationSelect as, Screen* old_screen, Screen* new_screen) {
     int stages = 18;
-    long startMillis = millis();
     new_screen->update();
     TFT_eSprite* oss = old_screen->spr;
     TFT_eSprite* nss = new_screen->spr;
     oss->pushSprite(0, 0);
     TFT_eSprite frameSpr = TFT_eSprite(&tft);
+    frameSpr.setColorDepth(8);
+    frameSpr.createSprite(240, 240);
 
     uint8_t* frame = (uint8_t*)frameSpr.getPointer();
     uint8_t* oldBuf = (uint8_t*)old_screen->spr->getPointer();
     uint8_t* newBuf = (uint8_t*)new_screen->spr->getPointer();
 
+    int previousProg = 0;
+
+    memcpy(frame, oldBuf, SCREEN_W * SCREEN_H);
+    long startMillis = millis();
     for (int i=0;i<stages;i++) {
         float t = (float) i / (stages-1);
-        float e = easeOutCubic(t);
-
-        uint8_t angle = e * 255;
-        drawSweepFrame(nss, angle);
-        // delay(12);
+        uint8_t angle = easeOutCubic(t) * 255;
+        uint32_t t1 = micros();
+        DirtyRect d = drawSweepFrame(frame, newBuf, previousProg, angle);
+        previousProg = angle;
+        uint32_t t2 = micros();
+        if (d.valid()) {
+            Serial.printf("dirty %dx%d\n", d.x2-d.x1+1, d.y2-d.y1+1);
+            frameSpr.pushSprite(d.x1, d.y1, d.x1, d.y1, d.x2 - d.x1 + 1, d.y2 - d.y1 + 1);
+        }
+        // frameSpr.pushSprite(0, 0);
+        uint32_t t3 = micros();
+        Serial.printf("frame %d, angle %d: render %lu us, push %lu us\n", i, angle, t2 - t1, t3 - t2);
+        delay(80);
     }
     activeScreen = new_screen;
     long timetaken = millis() - startMillis;
