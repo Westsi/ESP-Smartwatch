@@ -180,6 +180,7 @@ void turnScreenOff() {
 void setScreenBrightness(int val) {
     if (val == -1) { // load user set brightness and set it
         val = loadBrightness();
+        return;
     }
     ledcWrite(0, val);
     saveBrightness(val);
@@ -398,7 +399,7 @@ void sweepAnimation(AnimationSelect as, Screen* old_screen, Screen* new_screen) 
     long startMillis = millis();
     for (int i=0;i<stages;i++) {
         float t = (float) i / (stages-1);
-        uint8_t angle = easeOutCubic(t) * 255;
+        uint8_t angle = easeInOutCubic(t) * 255;
         uint32_t t1 = micros();
         DirtyRect d = drawSweepFrame(frame, newBuf, previousProg, angle);
         previousProg = angle;

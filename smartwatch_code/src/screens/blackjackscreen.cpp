@@ -334,7 +334,7 @@ void drawGameboard(TFT_eSprite* spr) {
 }
 
 void handleDealerDraw() {
-    while (getMaxHandValue(true) < 17) {
+    while (getMaxHandValue(true) < 17 && dhIdx >= 9) {
         dealerHand[dhIdx] = chooseRandomCard();
         dhIdx++;
     }
@@ -364,6 +364,7 @@ void handleDealerDraw() {
 }
 
 void handlePlayerHit() {
+    if (phIdx >= 9) return;
     playerHand[phIdx] = chooseRandomCard();
     phIdx++;
 }
