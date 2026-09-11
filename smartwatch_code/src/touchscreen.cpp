@@ -189,6 +189,7 @@ void setScreenBrightness(int val) {
 int getScreenBrightness() {
     if (loadBrightness() != ledcRead(0)) {
         Serial.println("BRIGHTNESS PROBLEM!!!");
+        return 255;
     }
     return ledcRead(0);
 }
