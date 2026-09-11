@@ -7,6 +7,7 @@
 typedef void(*InteractionCallback)(String gesture, int x, int y);
 
 extern long timeOfLastInteraction;
+extern CST816S touch;
 
 typedef struct IH {
     InteractionCallback callback;
