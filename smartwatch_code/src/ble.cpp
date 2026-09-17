@@ -103,7 +103,7 @@ void bt_setup() {
     BLEDevice::init("XSWatch");
     esp_err_t err = esp_ble_gatt_set_local_mtu(256);
     err = esp_ble_gap_config_local_icon(ESP_BLE_APPEARANCE_GENERIC_WATCH);
-
+    Serial.println("1");
     server = BLEDevice::createServer();
     server->setCallbacks(new MyServerCallbacks());
     
@@ -114,6 +114,7 @@ void bt_setup() {
         BLECharacteristic::PROPERTY_NOTIFY
     );
     batteryLevel->addDescriptor(new BLE2902());
+    Serial.println("2");
 
     stepService = server->createService(STEP_SERVICE_UUID);
     stepCount = stepService->createCharacteristic(
@@ -192,15 +193,19 @@ void bt_setup() {
     );
     timeZoneCharac->addDescriptor(new BLE2902());
     
+    Serial.println("3");
 
     batteryService->start();
     stepService->start();
     deviceInfoService->start();
     commandService->start();
     timeService->start();
+    Serial.println("4");
 
     BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
     initUpdaterBLE(server, pAdvertising);
+    Serial.println("5");
+
     pAdvertising->addServiceUUID(BATTERY_SERVICE_UUID);
     pAdvertising->addServiceUUID(DEVICE_INFO_SERVICE_UUID);
     pAdvertising->addServiceUUID(STEP_SERVICE_UUID);
@@ -210,6 +215,8 @@ void bt_setup() {
     pAdvertising->setMinPreferred(0x06);
     pAdvertising->setMinPreferred(0x12);
     pAdvertising->setAppearance(ESP_BLE_APPEARANCE_GENERIC_WATCH);
+    Serial.println("6-7");
+
     BLEDevice::startAdvertising();
     Serial.println("BLE started");
 }

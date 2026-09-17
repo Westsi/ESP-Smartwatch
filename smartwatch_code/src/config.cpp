@@ -9,11 +9,11 @@ void initConfig() {
 
 int loadBrightness() {
     if (!prefs.isKey(BRIGHTNESS_KEY)) {
-        Serial.println("saving brightness");
+        Serial.println("overwriting brightness");
         saveBrightness(255);
     }
-    int b = prefs.getInt(BRIGHTNESS_KEY, 255); // set 255 to default in case
-    Serial.printf("%d\n", b);
+    int b = prefs.getInt(BRIGHTNESS_KEY, 253); // set 255 to default in case
+    Serial.printf("LOADED BRIGHTNESS %d\n", b);
     return b;
 }
 

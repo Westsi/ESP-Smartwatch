@@ -116,7 +116,7 @@ void touch_loop() {
         Serial.print(touch.data.x);
         Serial.print("\t");
         Serial.println(touch.data.y);
-        if (millis() - timeOfLastInteraction < 200 || touch.gesture() == String("NONE")) {
+        if ( (millis() - timeOfLastInteraction < 200 || touch.gesture() == String("NONE")) && activeScreen != &hs) {
             Serial.println("returning");
             return;
         }
@@ -180,7 +180,7 @@ void turnScreenOff() {
 void setScreenBrightness(int val) {
     if (val == -1) { // load user set brightness and set it
         val = loadBrightness();
-        return;
+        // val = 255;
     }
     ledcWrite(0, val);
     saveBrightness(val);
@@ -189,7 +189,7 @@ void setScreenBrightness(int val) {
 int getScreenBrightness() {
     if (loadBrightness() != ledcRead(0)) {
         Serial.println("BRIGHTNESS PROBLEM!!!");
-        return 255;
+        // return 255;
     }
     return ledcRead(0);
 }

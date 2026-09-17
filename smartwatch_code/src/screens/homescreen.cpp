@@ -50,7 +50,8 @@ int scrollY = 0;
 int baseScrollY = 0;
 int startTouchY = 0;
 bool isDragging = false;
-const int maxScroll = 400;
+const int topPadding = 20;
+int maxScroll;
 
 
 void Homescreen::init(TFT_eSprite* spr, int width, int height) {
@@ -65,6 +66,7 @@ void Homescreen::init(TFT_eSprite* spr, int width, int height) {
     spr->setTextDatum(MC_DATUM);
     spr->setTextWrap(true);
     registerInteractionHandler(hsFullScreenHandler, 0, 240, 0, 240);
+    maxScroll = appTotalSpacing * (nIcons - 1);
 }
 
 void Homescreen::update() {
@@ -75,23 +77,23 @@ void Homescreen::update() {
     // spr->drawString(appIcons[activeicon]->scrname, 120, 200);
     int renderYTop = scrollY;
     int renderYBase = scrollY + 240;
-    int cumY = 20;
+    int cumY = topPadding;
     for (int i=0;i<nIcons;i++) {
         app_icon_t* ai = appIcons[i];
         int aiyTop = cumY;
         int aiyBase = cumY + appTotalSpacing;
+        cumY += appTotalSpacing;
         if (aiyTop > renderYBase) {
             // passed the screen range, anything past here is definitely out of range
             break;
         }
         if (aiyBase < renderYTop) {
             // not at screen range yet, increment cumY and continue
-            cumY += appTotalSpacing;
             continue;
         }
         aiyTop -= scrollY;
         aiyBase -= scrollY;
-        if (aiyTop > aiyBase || aiyTop < 0 || aiyBase > 240) {
+        if (aiyTop > aiyBase) {
             // something has gone wrong
             spr->fillScreen(TFT_RED);
         }
@@ -137,7 +139,7 @@ void hsFullScreenHandler(String gesture, int x, int y) {
     // const int maxScroll = 400;
 
     uint8_t touchEvent = touch.data.event;
-    if (touchEvent == 0) { // touch down
+    if (touchEvent == 0 || (touchEvent == 2 && !isDragging)) { // touch down
         startTouchY = touch.data.y;
         baseScrollY = scrollY;
         isDragging = true;
@@ -165,18 +167,22 @@ void hsFullScreenHandler(String gesture, int x, int y) {
 Screen* getIconFromCoords(int x, int y) {
     // for now, only y really matters
     int realY = y + scrollY;
-    int cumY = 20;
+    int cumY = topPadding;
     for (int i=0;i<nIcons;i++) {
         app_icon_t* ai = appIcons[i];
         int aiyTop = cumY;
         int aiyBase = cumY + appTotalSpacing;
-        if (realY < aiyTop) {
+        Serial.printf("App %s aiyTop=%d, aiyBase=%d, realY=%d\n", ai->scrname, aiyTop, aiyBase, realY);
+        if (realY > aiyBase) {
             cumY += appTotalSpacing;
+            Serial.printf("Incremented cumY=%d, realY=%d\n", cumY, realY);
             continue;
         }
         if (realY >= aiyTop && realY <= aiyBase) {
             // hit!
+            Serial.printf("Hit on %s\n", ai->scrname);
             return ai->scr;
         }
     }
+    Serial.println("No screens matched!");
 }
