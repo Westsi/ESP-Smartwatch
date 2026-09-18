@@ -53,6 +53,7 @@ void circleGrowAnimation(AnimationSelect as, Screen* old_screen, Screen* new_scr
 void sweepAnimation(AnimationSelect as, Screen* old_screen, Screen* new_screen);
 void animateSwitch(AnimationSelect as, Screen* os, Screen* ns);
 void recolorImage(const uint16_t* image, int w, int h, int newcol, uint16_t* buf);
+void drawScaledIcon8(TFT_eSprite* spr, const uint8_t* iconData, int srcW, int srcH, int dstX, int dstY, int dstW, int dstH, uint8_t transparentColor);
 
 // Fonts
 
