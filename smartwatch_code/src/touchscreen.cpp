@@ -486,12 +486,13 @@ void recolorImage(const uint16_t* image, int w, int h, int newcol, uint16_t* buf
     }
 }
 
-void drawScaledIcon8(TFT_eSprite* spr, const uint8_t* iconData, int srcW, int srcH, int dstX, int dstY, int dstW, int dstH, uint8_t transparentColor) {
+void drawScaledIcon16(TFT_eSprite* spr, const prog_uint16_t* iconData, int srcW, int srcH, int dstX, int dstY, int dstW, int dstH, uint8_t transparentColor) {
     // get pointer to spr frame buffer
     // clamp bounds
     // loop thru y and map y back
         // loop thru x and map x back
         // get color and write to buf (skip transparent)
+
 
     uint8_t* sprPtr =(uint8_t*) spr->getPointer();
     int startX = max(0, dstX);
@@ -500,20 +501,24 @@ void drawScaledIcon8(TFT_eSprite* spr, const uint8_t* iconData, int srcW, int sr
     int endY = min(239, dstY + dstH);
 
     for (int y=startY;y<endY;y++) {
-        // y-startY is progress along icon, divide by dstH for multiplier for srcH
-        int srcY = (y-startY) * srcH / dstH;
+        // y-dstY is progress along icon, divide by dstH for multiplier for srcH
+        int srcY = (y-dstY) * srcH / dstH;
         // calculate the offset for rows in src Icon and dst Screen
         int srcOffset = srcY * srcW;
         int dstOffset = y * SCREEN_W;
 
         for (int x=startX;x<endX;x++) {
-            int srcX = (x-startX) * srcW / dstW;
+            int srcX = (x-dstX) * srcW / dstW;
 
             // get color from original icon
-            uint8_t col = iconData[srcOffset + srcX];
+            uint16_t col16 = iconData[srcOffset + srcX];
+            // gets top 3 bits of RG, top 2 of B
+            uint8_t col8 = ((col16 & 0xE000) >> 8) |
+                            ((col16 & 0x0700) >> 6) |
+                            ((col16 & 0x0018) >> 3);
 
-            if (col != transparentColor) {
-                sprPtr[dstOffset + x] = col;
+            if (col8 != transparentColor) {
+                sprPtr[dstOffset + x] = col8;
             }
         }
     }

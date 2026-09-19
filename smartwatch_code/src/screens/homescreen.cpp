@@ -19,6 +19,7 @@
 #include "icons/settings_160.h" // settings
 #include "icons/notifications_160.h" // notifications
 #include "icons/play_160.h" // blackjack
+#include "icons/cool_emoji_160.h"
 
 void hsFullScreenHandler(String gesture, int x, int y);
 Screen* getIconFromCoords(int x, int y);
@@ -36,9 +37,10 @@ app_icon_t spotifyicon = {.icon=spotify_160, .scr=&sp, .scrname="Spotify"};
 app_icon_t blackjackicon = {.icon=play_160, .scr=&bs, .scrname="Blackjack"};
 app_icon_t exerciseicon = {.icon=steps_160, .scr=&es, .scrname="Exercise"};
 app_icon_t settingsicon = {.icon=settings_160, .scr=&ss, .scrname="Settings"};
+app_icon_t coolicon = {.icon=cool_emoji_160, .scr=&ss, .scrname="Test Aura"};
 
-app_icon_t* appIcons[] = {&watchfaceicon, &stopwatchicon, &notificationsicon, &spotifyicon, &blackjackicon, &exerciseicon, &settingsicon};
-int nIcons = 7;
+app_icon_t* appIcons[] = {&watchfaceicon, &stopwatchicon, &notificationsicon, &spotifyicon, &blackjackicon, &exerciseicon, &settingsicon, &coolicon};
+int nIcons = 8; // TODO: remember to increment nIcons
 
 // int activeicon = 0;
 
@@ -103,7 +105,7 @@ Continuous Scrolling function
 //             // something has gone wrong
 //             spr->fillScreen(TFT_RED);
 //         }
-//         spr->pushImage(40, aiyTop, iconWidth, iconWidth, ai->icon);
+        // spr->pushImage(40, aiyTop, iconWidth, iconWidth, ai->icon);
 //         spr->drawString(ai->scrname, 120, aiyTop + iconWidth + iconNameSpacing);
 //     }
     
@@ -141,9 +143,8 @@ void Homescreen::update() {
     int ncols = 7;
 
     // TODO: make this do icons instead of circles
-    // TODO: remove row 0
     int cnt = 100;
-    for (int i=0;i<cnt;i++) {
+    for (int i=0;i<nIcons;i++) {
         // we need to dynamically find the gridX and Y coordinates - we can fit 2 icons per odd row, 3 per even row
         // this needs to map to 0,0 0,1 0,2
         //                      1,0, 1,1
@@ -183,10 +184,19 @@ void Homescreen::update() {
         int currentRadius = (int)(baseRadius * rscale);
 
         // calculate color
-        int color = colors[i % ncols];
+        // int color = colors[i % ncols];
+
+        // get app icon
+        app_icon_t* ai = appIcons[i];
+        // get top left x and y, and width/height for the scaled icon
+        int tlx = posX - currentRadius;
+        int tly = posY - currentRadius;
+        int wh = 2 * currentRadius;
+        // scale icon
+        drawScaledIcon16(spr, ai->icon, 160, 160, tlx, tly, wh, wh, 0);
 
         // render circle
-        spr->fillCircle(posX, posY, currentRadius, color);
+        // spr->fillCircle(posX, posY, currentRadius, color);
     }
 }
 

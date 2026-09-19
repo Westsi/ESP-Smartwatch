@@ -3,3 +3,11 @@ Icons are from google fonts
 Size = 48
 Color = #FFFFFF
 Grade = 0
+
+
+How to convert to C:
+https://javl.github.io/image2cpp/
+upload image
+RGB565
+plain bytes
+copy output and refer to one of the existing header files for imports and so
