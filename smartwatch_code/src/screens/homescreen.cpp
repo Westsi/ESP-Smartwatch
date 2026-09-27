@@ -30,6 +30,13 @@ typedef struct hsaicon {
     const char* scrname;
 } app_icon_t;
 
+typedef struct scrlookup {
+    Screen* scr;
+    int cx;
+    int cy;
+    int r;
+} scr_lkp_t;
+
 app_icon_t watchfaceicon = {.icon=schedule_160, .scr=&wf, .scrname="Watch"};
 app_icon_t stopwatchicon = {.icon=schedule_160, .scr=&sw, .scrname="Stopwatch"};
 app_icon_t notificationsicon = {.icon=notifications_160, .scr=&ns, .scrname="Notifications"};
@@ -40,7 +47,7 @@ app_icon_t settingsicon = {.icon=settings_160, .scr=&ss, .scrname="Settings"};
 app_icon_t coolicon = {.icon=cool_emoji_160, .scr=&ss, .scrname="Test Aura"};
 
 app_icon_t* appIcons[] = {&watchfaceicon, &stopwatchicon, &notificationsicon, &spotifyicon, &blackjackicon, &exerciseicon, &settingsicon, &coolicon};
-int nIcons = 8; // TODO: remember to increment nIcons
+const int nIcons = 8; // TODO: remember to increment nIcons
 
 // int activeicon = 0;
 
@@ -60,6 +67,9 @@ const int topPadding = 20;
 int maxScroll;
 
 long lastFrameMillis;
+
+scr_lkp_t coordinateLookup[nIcons]; // for getIconFromCoords, updated in Homescreen::update when scroll changes
+int scrollAtLastCoordinateUpdate = -1;
 
 
 void Homescreen::init(TFT_eSprite* spr, int width, int height) {
@@ -131,7 +141,6 @@ void Homescreen::update() {
 
     lastFrameMillis = millis();
 
-    // initially we just draw coloured circles to test it
     const int lPad = 60;
     const int tPad = 100;
     const int baseSpacingX = 60; // horiz dist b/w cols
@@ -139,11 +148,13 @@ void Homescreen::update() {
     const int baseRadius = 30;
     const int centerX = 120;
     const int centerY = 120;
-    int colors[] = {TFT_RED, TFT_ORANGE, TFT_YELLOW, TFT_GREEN, TFT_BLUE, TFT_MAGENTA, TFT_VIOLET};
-    int ncols = 7;
 
-    // TODO: make this do icons instead of circles
-    int cnt = 100;
+    // we check if the scroll has changed since the last update to coordinateLookup
+    bool updatingCoords = false;
+    if (scrollY != scrollAtLastCoordinateUpdate) {
+        updatingCoords = true;
+    }
+
     for (int i=0;i<nIcons;i++) {
         // we need to dynamically find the gridX and Y coordinates - we can fit 2 icons per odd row, 3 per even row
         // this needs to map to 0,0 0,1 0,2
@@ -183,9 +194,6 @@ void Homescreen::update() {
         int finalY = centerY + (int)(dy * dscale);
         int currentRadius = (int)(baseRadius * rscale);
 
-        // calculate color
-        // int color = colors[i % ncols];
-
         // get app icon
         app_icon_t* ai = appIcons[i];
         // get top left x and y, and width/height for the scaled icon
@@ -194,9 +202,10 @@ void Homescreen::update() {
         int wh = 2 * currentRadius;
         // scale icon
         drawScaledIcon16(spr, ai->icon, 160, 160, tlx, tly, wh, wh, 0);
-
-        // render circle
-        // spr->fillCircle(posX, posY, currentRadius, color);
+        if (updatingCoords) {
+            scr_lkp_t iconCrd = {.scr = ai->scr, .cx = finalX, .cy = finalY, .r = currentRadius + 5};
+            coordinateLookup[i] = iconCrd;
+        }
     }
 }
 
@@ -272,26 +281,46 @@ void hsFullScreenHandler(String gesture, int x, int y) {
     }
 }
 
+// Screen* getIconFromCoords(int x, int y) {
+//     // for now, only y really matters
+//     int realY = y + scrollY;
+//     int cumY = topPadding;
+//     for (int i=0;i<nIcons;i++) {
+//         app_icon_t* ai = appIcons[i];
+//         int aiyTop = cumY;
+//         int aiyBase = cumY + appTotalSpacing;
+//         Serial.printf("App %s aiyTop=%d, aiyBase=%d, realY=%d\n", ai->scrname, aiyTop, aiyBase, realY);
+//         if (realY > aiyBase) {
+//             cumY += appTotalSpacing;
+//             Serial.printf("Incremented cumY=%d, realY=%d\n", cumY, realY);
+//             continue;
+//         }
+//         if (realY >= aiyTop && realY <= aiyBase) {
+//             // hit!
+//             Serial.printf("Hit on %s\n", ai->scrname);
+//             return ai->scr;
+//         }
+//     }
+//     Serial.println("No screens matched!");
+//     return NULL;
+// }
+
 Screen* getIconFromCoords(int x, int y) {
-    // for now, only y really matters
-    int realY = y + scrollY;
-    int cumY = topPadding;
+    // we have a choice here to try and reverse engineer the coordinates or to make a list of boundary coordinates when computing layout
+    // the list is faster and easier at the cost of memory
+    // use that for now
+
     for (int i=0;i<nIcons;i++) {
-        app_icon_t* ai = appIcons[i];
-        int aiyTop = cumY;
-        int aiyBase = cumY + appTotalSpacing;
-        Serial.printf("App %s aiyTop=%d, aiyBase=%d, realY=%d\n", ai->scrname, aiyTop, aiyBase, realY);
-        if (realY > aiyBase) {
-            cumY += appTotalSpacing;
-            Serial.printf("Incremented cumY=%d, realY=%d\n", cumY, realY);
-            continue;
-        }
-        if (realY >= aiyTop && realY <= aiyBase) {
-            // hit!
-            Serial.printf("Hit on %s\n", ai->scrname);
-            return ai->scr;
+        scr_lkp_t cl = coordinateLookup[i];
+        // use squared distance check
+        int dx = x - cl.cx;
+        int dy = y-cl.cy;
+        int d = dx * dx + dy * dy;
+        int r = cl.r * cl.r;
+        if (d < r) {
+            // hit
+            return cl.scr;
         }
     }
-    Serial.println("No screens matched!");
     return NULL;
 }
