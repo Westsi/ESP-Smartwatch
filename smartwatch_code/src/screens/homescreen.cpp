@@ -13,12 +13,23 @@
 #include <TFT_eSPI.h>
 #include <math.h>
 
-#include "icons/schedule_160.h" // watchface, stopwatch
-#include "icons/spotify_160.h" // spotify
-#include "icons/steps_160.h" // exercise tracker
-#include "icons/settings_160.h" // settings
-#include "icons/notifications_160.h" // notifications
-#include "icons/play_160.h" // blackjack
+// #include "icons/schedule_160.h" // watchface, stopwatch
+// #include "icons/spotify_160.h" // spotify
+// #include "icons/steps_160.h" // exercise tracker
+// #include "icons/settings_160.h" // settings
+// #include "icons/notifications_160.h" // notifications
+// #include "icons/play_160.h" // blackjack
+
+#include "icons/custom/watch_160.h"
+#include "icons/custom/stopwatch_160.h"
+#include "icons/custom/health_160.h"
+#include "icons/custom/blackjack_160.h"
+#include "icons/custom/settingsclear_160.h"
+#include "icons/custom/notifications_160.h"
+#include "icons/custom/music_160.h"
+#include "icons/custom/baseball_160.h"
+#include "icons/custom/weather_160.h"
+
 #include "icons/cool_emoji_160.h"
 
 void hsFullScreenHandler(String gesture, int x, int y);
@@ -37,17 +48,19 @@ typedef struct scrlookup {
     int r;
 } scr_lkp_t;
 
-app_icon_t watchfaceicon = {.icon=schedule_160, .scr=&wf, .scrname="Watch"};
-app_icon_t stopwatchicon = {.icon=schedule_160, .scr=&sw, .scrname="Stopwatch"};
+app_icon_t watchfaceicon = {.icon=watch_160, .scr=&wf, .scrname="Watch"};
+app_icon_t stopwatchicon = {.icon=stopwatch_160, .scr=&sw, .scrname="Stopwatch"};
 app_icon_t notificationsicon = {.icon=notifications_160, .scr=&ns, .scrname="Notifications"};
-app_icon_t spotifyicon = {.icon=spotify_160, .scr=&sp, .scrname="Spotify"};
-app_icon_t blackjackicon = {.icon=play_160, .scr=&bs, .scrname="Blackjack"};
-app_icon_t exerciseicon = {.icon=steps_160, .scr=&es, .scrname="Exercise"};
-app_icon_t settingsicon = {.icon=settings_160, .scr=&ss, .scrname="Settings"};
+app_icon_t musicicon = {.icon=music_160, .scr=&sp, .scrname="Music"};
+app_icon_t blackjackicon = {.icon=blackjack_160, .scr=&bs, .scrname="Blackjack"};
+app_icon_t exerciseicon = {.icon=health_160, .scr=&es, .scrname="Exercise"};
+app_icon_t settingsicon = {.icon=settingsclear_160, .scr=&ss, .scrname="Settings"};
 app_icon_t coolicon = {.icon=cool_emoji_160, .scr=&ss, .scrname="Test Aura"};
+app_icon_t baseballicon = {.icon=baseball_160, .scr=&ss, .scrname="Baseball Scores"};
+app_icon_t weathericon = {.icon=weather_160, .scr=&ss, .scrname="Weather"};
 
-app_icon_t* appIcons[] = {&watchfaceicon, &stopwatchicon, &notificationsicon, &spotifyicon, &blackjackicon, &exerciseicon, &settingsicon, &coolicon};
-const int nIcons = 8; // TODO: remember to increment nIcons
+app_icon_t* appIcons[] = {&watchfaceicon, &stopwatchicon, &notificationsicon, &musicicon, &blackjackicon, &exerciseicon, &settingsicon, &coolicon, &baseballicon, &weathericon};
+const int nIcons = 10; // TODO: remember to increment nIcons
 
 // int activeicon = 0;
 
