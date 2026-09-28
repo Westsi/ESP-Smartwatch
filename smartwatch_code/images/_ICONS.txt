@@ -11,3 +11,5 @@ upload image
 RGB565
 plain bytes
 copy output and refer to one of the existing header files for imports and so
+
+maybe redo custom ones?
