@@ -38,8 +38,12 @@ import com.xonize.xswatchconnect.utils.RealPathUtil;
 import com.xonize.xswatchconnect.utils.UpdaterUtils;
 
 import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,11 +52,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 
     public static MainActivity reference;
+
+    private final OkHttpClient client = new OkHttpClient();
 
     private TextView measurementValue;
 
@@ -64,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
     private final DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.ENGLISH);
     public static String notificationData = "";
     public static ArrayList<String> notifications = new ArrayList<>();
+    public static String weather = "";
 
     private NotificationReceiver nReceiver;
     public static SpotifyReceiver sReceiver;
@@ -122,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
         sendBroadcast(i);
 
         updateStatusText();
+        getLocAndWeather();
 
         Button selectFile = findViewById(R.id.select_file);
         selectFile.setOnClickListener(new View.OnClickListener() {
@@ -145,23 +158,23 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Timber.d("Uploading Update!!");
                 /*
-                * From looking through source, what I can gather:
-                * generate() splits the selected update file into parts that can be sent OTA (len < MTU-3)
-                * val parts is the number of parts
-                * 0xFD byte signals to the device that it is about to start sending, device prepares update file
-                * 0xFE byte signals that the file size is being sent, the shifts are just to make it fit into uint8 on receiving
-                * 0xFF byte signals that the number of parts is being sent, along with the MTU - again, bitshifts to fit into uint8
-                *
-                * After this, the watch is in "update mode" and will then request the first part
-                * - see onDataReceived comments below for more info
-                * */
+                 * From looking through source, what I can gather:
+                 * generate() splits the selected update file into parts that can be sent OTA (len < MTU-3)
+                 * val parts is the number of parts
+                 * 0xFD byte signals to the device that it is about to start sending, device prepares update file
+                 * 0xFE byte signals that the file size is being sent, the shifts are just to make it fit into uint8 on receiving
+                 * 0xFF byte signals that the number of parts is being sent, along with the MTU - again, bitshifts to fit into uint8
+                 *
+                 * After this, the watch is in "update mode" and will then request the first part
+                 * - see onDataReceived comments below for more info
+                 * */
 
                 /*
-                * Functions to Write:
-                * generate()
-                * sendData(byte[])
-                * byteArrayOfInts(int[])
-                * */
+                 * Functions to Write:
+                 * generate()
+                 * sendData(byte[])
+                 * byteArrayOfInts(int[])
+                 * */
 
                 /*
                 startOta = System.currentTimeMillis()
@@ -271,7 +284,6 @@ public class MainActivity extends AppCompatActivity {
     * */
 
 
-
     @SuppressLint("MissingPermission")
     @Override
     protected void onResume() {
@@ -292,19 +304,18 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isBluetoothEnabled() {
         BluetoothAdapter bluetoothAdapter = getBluetoothManager().getAdapter();
-        if(bluetoothAdapter == null) return false;
+        if (bluetoothAdapter == null) return false;
 
         return bluetoothAdapter.isEnabled();
     }
 
-    private void initBluetoothHandler()
-    {
+    private void initBluetoothHandler() {
         BluetoothHandler.getInstance(getApplicationContext());
     }
 
     @NotNull
     private BluetoothManager getBluetoothManager() {
-        return Objects.requireNonNull((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE),"cannot get BluetoothManager");
+        return Objects.requireNonNull((BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE), "cannot get BluetoothManager");
     }
 
     @Override
@@ -529,6 +540,153 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             String statusText = "Connecting";
         }
+    }
+
+    private void getLocAndWeather() {
+        String ipApiUrl = "https://free.freeipapi.com/api/v1/json/";
+
+        Request request = new Request.Builder()
+                .url(ipApiUrl)
+                .addHeader("User-Agent", "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Mobile Safari/537.36")
+                .addHeader("Accept", "application/json")
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Timber.e("Something failed in get weather");
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    Timber.e("unsuccessful call, code: %d, call %s", response.code(), call.toString());
+                    return;
+                }
+
+                try {
+                    String responseData = response.body().string();
+                    JSONObject json = new JSONObject(responseData);
+
+                    // Extract latitude and longitude from FreeIPAPI response
+                    double latitude = json.getDouble("latitude");
+                    double longitude = json.getDouble("longitude");
+
+                    // Step 2: Fetch weather using extracted coordinates
+                    fetchWeatherData(latitude, longitude);
+
+                } catch (JSONException e) {
+                    Timber.e("Failed to parse location JSON response");
+                }
+            }
+        });
+    }
+
+    private void fetchWeatherData(double latitude, double longitude) {
+        // Construct openmeteo endpoint URL
+        String weatherUrl = String.format(Locale.US,
+                "https://api.open-meteo.com/v1/forecast?latitude=%.6f&longitude=%.6f&daily=sunrise,sunset,temperature_2m_max,temperature_2m_min&hourly=temperature_2m,cloud_cover,relative_humidity_2m,apparent_temperature,precipitation,precipitation_probability,uv_index,wind_speed_10m,wind_direction_10m&timezone=auto&timeformat=unixtime",
+                latitude, longitude);
+
+        Request request = new Request.Builder()
+                .url(weatherUrl)
+                .addHeader("User-Agent", "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Mobile Safari/537.36")
+                .addHeader("Accept", "application/json")
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Timber.e("Failed to fetch weather: %s", e.getMessage());
+            }
+
+            @SuppressLint("DefaultLocale")
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    Timber.e("Weather request failed: HTTP %d, call %s", response.code(), call.request().headers());
+                    return;
+                }
+
+                try {
+                    String responseData = response.body().string();
+                    JSONObject json = new JSONObject(responseData);
+                    Timber.i(String.valueOf(json));
+                    // the info we get is: (assume all at 2m above gnd)
+                    // all info should be ISO timestamped in current timezone (auto detects it - if this starts failing use phone timezone in urls)
+                    /*
+                    * HOURLY
+                    * temp
+                    * relative humidity
+                    * apparent temp
+                    * precipitation probability
+                    * precipitation amount
+                    * total cloud cover
+                    * wind speed (10m)
+                    * wind direction (10m)
+                    * UV index
+                    *
+                    * DAILY
+                    * max temp
+                    * min temp
+                    * sunrise time
+                    * sunset time
+                    * */
+                    JSONObject h = json.getJSONObject("hourly");
+                    JSONArray hTimes = h.getJSONArray("time"); // longs, seconds since epoch
+                    JSONArray hTemps = h.getJSONArray("temperature_2m"); // doubles, ºC
+                    JSONArray hCloud = h.getJSONArray("cloud_cover"); // doubles, %
+                    JSONArray hRelHum = h.getJSONArray("relative_humidity_2m"); // doubles, %
+                    JSONArray hAppTemp = h.getJSONArray("apparent_temperature"); // doubles, ºC
+                    JSONArray hPrec = h.getJSONArray("precipitation"); // doubles, mm
+                    JSONArray hPrecProb = h.getJSONArray("precipitation_probability"); // doubles, %
+                    JSONArray hUVInd = h.getJSONArray("uv_index"); // doubles
+                    JSONArray hWindVel = h.getJSONArray("wind_speed_10m"); // doubles, kmh
+                    JSONArray hWindDir = h.getJSONArray("wind_direction_10m"); // ints, º from north
+
+                    JSONObject d = json.getJSONObject("daily");
+                    JSONArray dTimes = d.getJSONArray("time"); // longs, seconds since epoch
+                    JSONArray dSunrise = d.getJSONArray("sunrise"); // longs, seconds since epoch
+                    JSONArray dSunset = d.getJSONArray("sunset"); // longs, seconds since epoch
+                    JSONArray dTempMax = d.getJSONArray("temperature_2m_max"); // doubles, ºC
+                    JSONArray dTempMin = d.getJSONArray("temperature_2m_min"); // doubles ºC
+
+                    StringBuilder result = new StringBuilder();
+                    int nh = hTimes.length();
+                    for (int i=0;i<nh;i++) {
+                        result.append(String.format("TIME%d~~TEMP%f~~CLOUD%f~~RELHUM%f~~APPTEMP%f~~PREC%f~~PRECPROB%f~~UV%f~~WINDVEL%f~~WINDDIR%d~~END_HOUR~~",
+                                hTimes.getLong(i),
+                                hTemps.getDouble(i),
+                                hCloud.getDouble(i),
+                                hRelHum.getDouble(i),
+                                hAppTemp.getDouble(i),
+                                hPrec.getDouble(i),
+                                hPrecProb.getDouble(i),
+                                hUVInd.getDouble(i),
+                                hWindVel.getDouble(i),
+                                hWindDir.getInt(i)));
+                    }
+
+                    int nd = dTimes.length();
+                    result.append("START_DAYS~~");
+                    for (int i=0;i<nd;i++) {
+                        result.append(String.format("TIME%d~~SUNRISE%d~~SUNSET%d~~MAXTEMP%f~~MINTEMP%f~~END_DAY~~",
+                                dTimes.getLong(i),
+                                dSunrise.getLong(i),
+                                dSunset.getLong(i),
+                                dTempMax.getDouble(i),
+                                dTempMin.getDouble(i)));
+                    }
+                    result.append("END_WEATHER");
+
+                    weather = result.toString();
+                    Timber.i(weather);
+
+                } catch (JSONException e) {
+                    Timber.e("Failed to parse weather JSON response, %s", e.getMessage());
+                }
+            }
+        });
     }
 
     class NotificationReceiver extends BroadcastReceiver {

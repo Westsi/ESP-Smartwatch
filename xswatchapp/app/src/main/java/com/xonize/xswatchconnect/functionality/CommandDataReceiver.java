@@ -54,6 +54,12 @@ public class CommandDataReceiver extends BroadcastReceiver {
             MainActivity.sReceiver.nextSpotify();
         }
 
+        else if (Objects.equals(data, "SYNC_WEATHER")) {
+            Timber.d("Syncing weather");
+            isSending = true;
+            syncWeather(context, peripheral);
+        }
+
         else if (Objects.equals(data, "SYNC_TIME")) {
             Timber.d("Syncing time");
             isSending = true;
@@ -98,6 +104,23 @@ public class CommandDataReceiver extends BroadcastReceiver {
                 BluetoothHandler.COMMAND_CHAR_UUID,
                 "END_SONG".getBytes(), // let device know that this is the end of the song
                 WriteType.WITH_RESPONSE);
+        peripheral.writeCharacteristic(BluetoothHandler.COMMAND_SERVICE_UUID,
+                BluetoothHandler.COMMAND_CHAR_UUID,
+                "END_ALL".getBytes(), // let device know that this is the end of the transmission
+                WriteType.WITH_RESPONSE);
+        isSending = false;
+
+    }
+
+
+    private void syncWeather(Context ctx, BluetoothPeripheral peripheral) {
+        MessageClipper messageClipper = new MessageClipper(MainActivity.weather, 32);
+        while (!messageClipper.messageComplete()) {
+            peripheral.writeCharacteristic(BluetoothHandler.COMMAND_SERVICE_UUID,
+                    BluetoothHandler.COMMAND_CHAR_UUID,
+                    messageClipper.getNextMessage().getBytes(),
+                    WriteType.WITH_RESPONSE);
+        }
         peripheral.writeCharacteristic(BluetoothHandler.COMMAND_SERVICE_UUID,
                 BluetoothHandler.COMMAND_CHAR_UUID,
                 "END_ALL".getBytes(), // let device know that this is the end of the transmission

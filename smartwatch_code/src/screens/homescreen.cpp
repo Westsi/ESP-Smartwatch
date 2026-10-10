@@ -59,10 +59,9 @@ app_icon_t coolicon = {.icon=cool_emoji_160, .scr=&ss, .scrname="Test Aura"};
 app_icon_t baseballicon = {.icon=baseball_160, .scr=&ss, .scrname="Baseball Scores"};
 app_icon_t weathericon = {.icon=weather_160, .scr=&ss, .scrname="Weather"};
 
-app_icon_t* appIcons[] = {&watchfaceicon, &stopwatchicon, &notificationsicon, &musicicon, &blackjackicon, &exerciseicon, &settingsicon, &coolicon, &baseballicon, &weathericon};
-const int nIcons = 10; // TODO: remember to increment nIcons
+app_icon_t* appIcons[] = {&settingsicon, &stopwatchicon, &notificationsicon, &musicicon, &blackjackicon, &exerciseicon, &watchfaceicon, &coolicon, &baseballicon, &weathericon};
+const int nIcons = sizeof(appIcons) / sizeof(app_icon_t*); // TODO: remember to increment nIcons - does this change work? it should be 10
 
-// int activeicon = 0;
 
 uint8_t iconNameSpacing = 20; // spacing between bottom of icon and mid of text
 uint8_t appTotalSpacing = 200;

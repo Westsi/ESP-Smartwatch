@@ -27,9 +27,9 @@
 
 #define MANU_NAME "XONIZE_IND"
 #define MODEL_NUM "XSW1"
-#define FIRMWARE_REV "0.1.0-alpha.1"
-#define SOFTWARE_REV "0.1.0-alpha.1"
-#define HARDWARE_REV "0.1.0-testing.1"
+#define FIRMWARE_REV "0.2.0-alpha.1"
+#define SOFTWARE_REV "0.4.1-alpha.1"
+#define HARDWARE_REV "1.0.0-beta.1"
 #define SYSTEM_ID "XSW-DEADBEEF1"
 
 #define TFT_XON_BLUE 0x3535 // #37a4ad
